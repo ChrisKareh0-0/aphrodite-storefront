@@ -1,0 +1,420 @@
+.order-confirmation-page {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background: #f9fafb;
+}
+
+.confirmation-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+}
+
+.spinner-large {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #111827;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.error-state i {
+  font-size: 4rem;
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+
+.error-state h2 {
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.error-state p {
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+.success-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.success-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: #10b981;
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+}
+
+.success-icon i {
+  font-size: 3rem;
+  color: white;
+}
+
+.success-header h1 {
+  font-size: 2rem;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.success-header p {
+  color: #6b7280;
+  font-size: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.order-info-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 2rem;
+}
+
+.order-header h2 {
+  font-size: 1.5rem;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.order-number {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-processing {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-shipped {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.status-delivered {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.order-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.order-section h3 {
+  font-size: 1.125rem;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.info-grid,
+.payment-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.info-item i {
+  font-size: 1.5rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.info-value {
+  font-size: 1rem;
+  color: #111827;
+  font-weight: 500;
+}
+
+.address-box {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.address-box i {
+  font-size: 1.5rem;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.address-box p {
+  color: #374151;
+  line-height: 1.6;
+  margin: 0.125rem 0;
+}
+
+.order-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.order-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  align-items: center;
+}
+
+.item-image {
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-details h4 {
+  font-size: 1rem;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.item-details p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0.125rem 0;
+}
+
+.item-quantity {
+  font-weight: 500;
+  color: #374151;
+}
+
+.item-price {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  text-align: right;
+}
+
+.order-totals {
+  padding: 1.5rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  color: #374151;
+}
+
+.total-divider {
+  border-top: 2px solid #e5e7eb;
+  margin: 1rem 0;
+}
+
+.total-final {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.continue-shopping-btn,
+.print-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.continue-shopping-btn {
+  background: #111827;
+  color: white;
+}
+
+.continue-shopping-btn:hover {
+  background: #1f2937;
+}
+
+.print-btn {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.print-btn:hover {
+  background: #e5e7eb;
+}
+
+.next-steps {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.next-steps h3 {
+  font-size: 1.25rem;
+  color: #111827;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.step-card {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.step-card i {
+  font-size: 2.5rem;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.step-card h4 {
+  font-size: 1rem;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.step-card p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .order-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .info-grid,
+  .payment-info {
+    grid-template-columns: 1fr;
+  }
+
+  .confirmation-actions {
+    flex-direction: column;
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .order-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .item-price {
+    text-align: left;
+  }
+}
+
+@media print {
+  .order-confirmation-page {
+    background: white;
+  }
+
+  .confirmation-actions,
+  .next-steps {
+    display: none;
+  }
+
+  .order-info-card {
+    box-shadow: none;
+  }
+}

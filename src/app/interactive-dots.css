@@ -1,0 +1,100 @@
+/* ------- Interactive Dots Component (Light) ------- */
+
+.section-resource {
+  padding: 4em;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  display: flex;
+  position: relative;
+  background-color: #ffffff; /* White background */
+  color: #000000;
+  font-size: 1vw;
+  margin: 0;
+  overscroll-behavior: none;
+}
+
+.section-resource a,
+.section-resource button {
+  cursor: pointer;
+}
+
+.aphrodite-text {
+  font-family: 'PP Neue Montreal', Arial, sans-serif;
+  font-size: 4em;
+  font-weight: 700;
+  color: #000000;
+  text-align: center;
+  position: absolute;
+  z-index: 0;
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.dots-wrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.dots-container {
+  grid-column-gap: 2em;
+  grid-row-gap: 2em;
+  pointer-events: none;
+  flex-flow: wrap;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr;
+  grid-auto-columns: 1fr;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  position: absolute;
+  inset: 0em;
+  z-index: 0;
+}
+
+/* Ensure container has a minimum height on very small screens */
+@media (max-width: 480px) {
+  .dots-container { min-height: 200px; }
+}
+
+.dot {
+  will-change: transform, background-color;
+  transform-origin: center;
+  background-color: rgba(0, 0, 0, 0.9) !important; /* Black dots */
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+  position: relative;
+  transform: translate(0);
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.dot:hover { opacity: 1; }
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('https://cdn.prod.website-files.com/6819ed8312518f61b84824df/6819ed8312518f61b84825ba_PPNeueMontreal-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  /* Hide entire section on mobile to push content up */
+  .section-resource {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Hide entire section on small phones too */
+  .section-resource {
+    display: none;
+  }
+}
+
+
