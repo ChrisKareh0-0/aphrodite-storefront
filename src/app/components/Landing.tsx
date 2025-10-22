@@ -38,8 +38,10 @@ export default function Landing() {
   useEffect(() => {
     (async () => {
       try {
+        console.log('🔄 Fetching hero data from:', `${backendUrl}/api/hero`);
         const response = await fetch(`${backendUrl}/api/hero`);
         const data = await response.json();
+        console.log('✅ Hero data:', data);
         setHeroData(data);
       } catch (error) {
         console.error('Error fetching hero data:', error);

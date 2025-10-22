@@ -79,8 +79,8 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
   const fetchProductDetails = async () => {
     try {
       setLoading(true);
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
-  const response = await fetch(`${backendUrl}/api/products/${productId}`);
+      console.log('🔄 Fetching product details for ID:', productId, 'from:', `${backendUrl}/api/products/${productId}`);
+      const response = await fetch(`${backendUrl}/api/products/${productId}`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -93,9 +93,11 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
       }
 
       const data = await response.json();
+      console.log('✅ Product details data:', data);
 
       // Ensure images array has at least one valid image
       if (!data.images || data.images.length === 0 || !data.images[0]) {
+        console.warn('⚠️ No images found for product, using placeholder');
         data.images = ['/placeholder-product.svg'];
       }
 
@@ -291,7 +293,18 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
             {/* Image Gallery */}
             <div className="product-gallery">
               <div className="main-image">
-                <Image src={product.images[selectedImage]} alt={product.name} width={500} height={500} />
+                <Image 
+                  src={product.images[selectedImage]?.startsWith('http') ? 
+                       product.images[selectedImage] : 
+                       `${backendUrl}${product.images[selectedImage]}`} 
+                  alt={product.name} 
+                  width={500} 
+                  height={500}
+                  onError={(e) => {
+                    console.error('❌ Failed to load main image:', product.images[selectedImage]);
+                    e.currentTarget.src = '/placeholder-product.svg';
+                  }}
+                />
                 <button
                   className={`wishlist-btn ${isWishlisted ? 'active' : ''}`}
                   onClick={toggleWishlist}
@@ -306,7 +319,16 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                     className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
                     onClick={() => setSelectedImage(index)}
                   >
-                    <Image src={image} alt={`${product.name} ${index + 1}`} width={100} height={100} />
+                    <Image 
+                      src={image?.startsWith('http') ? image : `${backendUrl}${image}`}
+                      alt={`${product.name} ${index + 1}`} 
+                      width={100} 
+                      height={100}
+                      onError={(e) => {
+                        console.error('❌ Failed to load thumbnail:', image);
+                        e.currentTarget.src = '/placeholder-product.svg';
+                      }}
+                    />
                   </button>
                 ))}
               </div>
@@ -560,11 +582,15 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                     <div key={relatedProduct.id} className="related-product-item">
                       <div className="product-image">
                         <Image
-                          src={imageUrl}
+                          src={imageUrl?.startsWith('http') ? imageUrl : `${backendUrl}${imageUrl}`}
                           alt={relatedProduct.name}
                           width={200}
                           height={200}
                           style={{ objectFit: 'cover' }}
+                          onError={(e) => {
+                            console.error('❌ Failed to load related product image:', imageUrl);
+                            e.currentTarget.src = '/placeholder-product.svg';
+                          }}
                         />
                       </div>
                       <div className="product-info">

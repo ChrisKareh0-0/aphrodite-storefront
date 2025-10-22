@@ -13,6 +13,14 @@ interface Product {
   images: string[];
 }
 
+interface BackendProduct {
+  id: number | string;
+  name: string;
+  slug?: string;
+  price: number;
+  images: Array<string | { url: string }>;
+}
+
 interface BackendCategory {
   _id: string;
   name: string;
@@ -62,8 +70,10 @@ export default function CategoriesGallery() {
 
   const fetchCollectionSettings = async () => {
     try {
+      console.log('🔄 Fetching collection settings from:', `${BACKEND_URL}/api/collection`);
       const response = await fetch(`${BACKEND_URL}/api/collection`);
       const data = await response.json();
+      console.log('✅ Collection settings data:', data);
       setCollectionSettings(data);
     } catch (error) {
       console.error('Error fetching collection settings:', error);
@@ -76,8 +86,23 @@ export default function CategoriesGallery() {
       setLoading(true);
 
       // Fetch categories from backend
+      console.log('🔄 Fetching categories from:', `${BACKEND_URL}/api/categories`);
       const categoriesResponse = await fetch(`${BACKEND_URL}/api/categories`);
-      const categoriesData = await categoriesResponse.json();      if (!categoriesData.categories || categoriesData.categories.length === 0) {
+      if (!categoriesResponse.ok) {
+        throw new Error(`HTTP error! status: ${categoriesResponse.status}`);
+      }
+      const categoriesData = await categoriesResponse.json();
+      console.log('✅ Categories data:', categoriesData);
+      
+      // Check the shape of the response
+      if (!categoriesData || !Array.isArray(categoriesData.categories)) {
+        console.error('❌ Invalid categories response format:', categoriesData);
+        setCategories([]);
+        return;
+      }
+      
+      if (categoriesData.categories.length === 0) {
+        console.warn('⚠️ No categories found in response');
         setCategories([]);
         return;
       }
@@ -89,13 +114,41 @@ export default function CategoriesGallery() {
       const processedCategories = await Promise.all(
         categoriesData.categories.map(async (cat: BackendCategory, index: number) => {
             try {
-            const productsResponse = await fetch(`${BACKEND_URL}/api/products?category=${cat.slug}&limit=3`);
-            const productsData = await productsResponse.json();
+              console.log(`🔄 Fetching products for category "${cat.name}" from:`, `${BACKEND_URL}/api/products?category=${cat.slug}&limit=3`);
+              const productsResponse = await fetch(`${BACKEND_URL}/api/products?category=${cat.slug}&limit=3`);
+              if (!productsResponse.ok) {
+                throw new Error(`HTTP error! status: ${productsResponse.status}`);
+              }
+              const productsData = await productsResponse.json();
+              console.log(`✅ Products data for category "${cat.name}":`, productsData);
+              
+              if (!productsData || !Array.isArray(productsData.products)) {
+                console.error(`❌ Invalid products response format for category "${cat.name}":`, productsData);
+                return null;
+              }
 
             // Handle relative image paths from backend
             const categoryImage = cat.image
               ? (cat.image.startsWith('http') ? cat.image : `${BACKEND_URL}${cat.image}`)
               : "https://i.postimg.cc/Xqmwr12c/clothing.webp";
+
+            // Map the products data, ensuring proper image URL handling
+            const mappedProducts = (productsData.products || []).map((prod: BackendProduct) => ({
+              ...prod,
+              images: (prod.images || []).map((img: string | { url: string }) => 
+                typeof img === 'string' 
+                  ? (img.startsWith('http') ? img : `${BACKEND_URL}${img}`)
+                  : (img.url ? (img.url.startsWith('http') ? img.url : `${BACKEND_URL}${img.url}`) : '')
+              ).filter(Boolean)
+            }));
+
+            // Ensure each product has at least one image
+            mappedProducts.forEach((prod: BackendProduct) => {
+              if (!prod.images || prod.images.length === 0) {
+                console.warn(`⚠️ No images found for product "${prod.name}", using placeholder`);
+                prod.images = ['/placeholder-product.svg'];
+              }
+            });
 
             return {
               id: cat._id,
@@ -105,7 +158,7 @@ export default function CategoriesGallery() {
               image: categoryImage,
               color: colors[index % colors.length],
               category: cat.slug,
-              products: productsData.products || []
+              products: mappedProducts
             };
           } catch (error) {
             console.error(`Error fetching products for category ${cat.name}:`, error);
@@ -127,8 +180,25 @@ export default function CategoriesGallery() {
         })
       );
 
-  // Only show categories with products
-  setCategories(processedCategories.filter(cat => cat.products && cat.products.length > 0));
+      // Filter out null categories and those without products
+      const validCategories = processedCategories
+        .filter((cat): cat is Category => {
+          if (!cat) {
+            console.warn('⚠️ Found null category in processed results');
+            return false;
+          }
+          if (!cat.products || cat.products.length === 0) {
+            console.warn(`⚠️ No products found for category "${cat.title}"`);
+            return false;
+          }
+          return true;
+        });
+
+      if (validCategories.length === 0) {
+        console.warn('⚠️ No valid categories with products found');
+      }
+
+      setCategories(validCategories);
     } catch (error) {
       console.error('Error fetching categories:', error);
       // Fallback to empty categories
@@ -261,7 +331,18 @@ export default function CategoriesGallery() {
                     {category.products.map((product, pidx) => (
                       <div key={pidx} className="categories-gallery__product">
                         <div className="categories-gallery__product-image" onClick={() => handleProductClick(product.slug || String(product.id))}>
-                          <Image src={product.images[0]} alt={product.name} width={200} height={200} />
+                          <Image 
+                            src={product.images[0]?.startsWith('http') ? product.images[0] : `${BACKEND_URL}${product.images[0]}`} 
+                            alt={product.name} 
+                            width={200} 
+                            height={200}
+                            onError={(e) => {
+                              // Log the failed image URL
+                              console.error('❌ Failed to load image:', product.images[0]);
+                              // Fallback to placeholder
+                              e.currentTarget.src = '/placeholder-product.svg';
+                            }}
+                          />
                           <div className="categories-gallery__product-overlay">
                             <button className="categories-gallery__product-btn">
                               <i className="bx bx-shopping-bag"></i>

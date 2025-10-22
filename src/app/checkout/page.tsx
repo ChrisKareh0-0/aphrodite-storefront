@@ -37,11 +37,13 @@ export default function Checkout() {
     e.preventDefault();
 
     if (cart.length === 0) {
+      console.warn('⚠️ Attempted checkout with empty cart');
       toast.error('Your cart is empty');
       return;
     }
 
     setLoading(true);
+    console.log('🛒 Starting checkout process...');
 
     try {
       const orderData = {
@@ -74,6 +76,17 @@ export default function Checkout() {
         notes: formData.notes
       };
 
+      console.log('📝 Creating order with data:', {
+        customer: {
+          name: orderData.customer.name,
+          email: orderData.customer.email,
+          phone: orderData.customer.phone
+        },
+        itemCount: orderData.items.length,
+        total: orderData.total,
+        paymentMethod: orderData.paymentMethod
+      });
+
       const response = await fetch(`${backendUrl}/api/orders/create`, {
         method: 'POST',
         headers: {
@@ -85,16 +98,27 @@ export default function Checkout() {
       const data = await response.json();
 
       if (!response.ok) {
+        console.error('❌ Order creation failed:', {
+          status: response.status,
+          error: data.error || 'Unknown error'
+        });
         throw new Error(data.error || 'Failed to create order');
       }
+
+      console.log('✅ Order created successfully:', {
+        orderNumber: data.order.orderNumber,
+        total: data.order.total,
+        status: data.order.status
+      });
 
       toast.success('Order placed successfully!');
       clearCart();
       router.push(`/order-confirmation/${data.order.orderNumber}`);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('❌ Checkout process failed:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to place order');
     } finally {
+      console.log('🔄 Checkout process completed');
       setLoading(false);
     }
   };

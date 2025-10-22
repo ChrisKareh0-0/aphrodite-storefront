@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = 'https://aphrodite-admin.onrender.com';
+import { BACKEND_URL } from '@/constants';
 
 export async function GET(request: NextRequest) {
   try {

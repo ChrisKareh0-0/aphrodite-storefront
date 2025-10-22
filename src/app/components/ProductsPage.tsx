@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import toast from 'react-hot-toast';
+import { BACKEND_URL } from "@/constants";
 
 interface Product {
   id: number | string;
@@ -45,7 +47,6 @@ interface ProductsResponse {
 export default function ProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +68,10 @@ export default function ProductsPage() {
     fetchProducts();
   }, [currentPage, selectedCategory, selectedBrand, searchQuery, sortBy, minPrice, maxPrice, featuredOnly]);
 
+  const backendUrl = 'https://aphrodite-admin.onrender.com';
+
   const fetchProducts = useCallback(async () => {
+    let productsResponse, productsData;
     try {
       setLoading(true);
 
@@ -77,6 +81,29 @@ export default function ProductsPage() {
       if (selectedBrand) params.append('brand', selectedBrand);
       if (searchQuery) params.append('search', searchQuery);
       if (sortBy !== 'created') params.append('sortBy', sortBy);
+
+      console.log('🔄 Fetching products with params:', Object.fromEntries(params.entries()));
+      productsResponse = await fetch(`${backendUrl}/api/products?${params.toString()}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        credentials: 'include'
+      });
+      productsData = await productsResponse.json();
+      console.log('✅ Products response:', { 
+        total: productsData.pagination?.total,
+        page: productsData.pagination?.page,
+        total_pages: productsData.pagination?.totalPages,
+        products_count: productsData.products.length 
+      });
+
+      setProducts(productsData.products);
+      setPagination(productsData.pagination);
+      setFilters(productsData.filters);
+      setError(null);
+
+      console.log('🔄 Fetching products with params:', Object.fromEntries(params.entries()));
       if (minPrice > 0) params.append('minPrice', minPrice.toString());
       if (maxPrice < 1000) params.append('maxPrice', maxPrice.toString());
       if (featuredOnly) params.append('isFeatured', 'true');
@@ -360,10 +387,16 @@ export default function ProductsPage() {
                     >
                       <div className="product-image">
                         {product.images?.[0] ? (
-                          <img
-                            src={product.images[0]}
+                          <Image
+                            src={product.images[0]?.startsWith('http') ? product.images[0] : `${BACKEND_URL}${product.images[0]}`}
                             alt={product.name}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            width={300}
+                            height={300}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={(e) => {
+                              console.error('❌ Failed to load product image:', product.images[0]);
+                              e.currentTarget.src = '/placeholder-product.svg';
+                            }}
                           />
                         ) : (
                           <div style={{ width: '100%', height: '100%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -51,6 +51,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [cart, isLoaded]);
 
   const addToCart = (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
+    console.log('🛍️ Adding to cart:', {
+      productId: item.productId,
+      name: item.name,
+      quantity: item.quantity || 1,
+      color: item.color,
+      size: item.size
+    });
+
     setCart((prevCart) => {
       const existingItem = prevCart.find(
         (cartItem) =>
@@ -62,9 +70,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (existingItem) {
         const newQuantity = existingItem.quantity + (item.quantity || 1);
         if (newQuantity > item.stock) {
+          console.warn('⚠️ Cannot add more items than available in stock', {
+            requested: newQuantity,
+            available: item.stock
+          });
           toast.error('Cannot add more items than available in stock');
           return prevCart;
         }
+        console.log('✅ Updated existing cart item quantity', {
+          productId: item.productId,
+          oldQuantity: existingItem.quantity,
+          newQuantity
+        });
         toast.success('Cart updated');
         return prevCart.map((cartItem) =>
           cartItem.productId === item.productId &&
@@ -75,34 +92,61 @@ export function CartProvider({ children }: { children: ReactNode }) {
         );
       }
 
+      console.log('✅ Added new item to cart');
       toast.success('Added to cart');
       return [...prevCart, { ...item, quantity: item.quantity || 1 }];
     });
   };
 
   const removeFromCart = (productId: string, color?: string, size?: string) => {
-    setCart((prevCart) =>
-      prevCart.filter((item) =>
+    console.log('🗑️ Removing from cart:', { productId, color, size });
+    setCart((prevCart) => {
+      const itemToRemove = prevCart.find(item => 
+        item.productId === productId &&
+        item.color === color &&
+        item.size === size
+      );
+      if (itemToRemove) {
+        console.log('✅ Removing item:', {
+          name: itemToRemove.name,
+          quantity: itemToRemove.quantity,
+          price: itemToRemove.price
+        });
+      }
+      return prevCart.filter((item) =>
         !(item.productId === productId &&
           item.color === color &&
           item.size === size)
-      )
-    );
+      );
+    });
     toast.success('Removed from cart');
   };
 
   const updateQuantity = (productId: string, quantity: number, color?: string, size?: string) => {
-    if (quantity < 1) return;
+    if (quantity < 1) {
+      console.warn('⚠️ Invalid quantity update request:', { productId, quantity });
+      return;
+    }
 
+    console.log('🔄 Updating cart item quantity:', { productId, newQuantity: quantity, color, size });
     setCart((prevCart) =>
       prevCart.map((item) => {
         if (item.productId === productId &&
             item.color === color &&
             item.size === size) {
           if (quantity > item.stock) {
+            console.warn('⚠️ Cannot update: quantity exceeds stock', {
+              requested: quantity,
+              available: item.stock
+            });
             toast.error('Cannot add more items than available in stock');
             return item;
           }
+          console.log('✅ Updated quantity:', {
+            name: item.name,
+            oldQuantity: item.quantity,
+            newQuantity: quantity
+          });
           return { ...item, quantity };
         }
         return item;
