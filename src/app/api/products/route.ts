@@ -44,20 +44,21 @@ export async function GET(request: NextRequest) {
     const data = await backendResponse.json();
 
     // Transform backend data to match frontend expectations
-    const transformedProducts = (data.products || []).map((product: any) => {
+    const transformedProducts = (data.products || []).map((product: Record<string, unknown>) => {
       // Get image URL - handle both array of objects and array of strings
       let imageUrls: string[] = [];
-      if (product.images && product.images.length > 0) {
-        imageUrls = product.images.map((img: any) => {
-          const imgUrl = typeof img === 'string' ? img : img?.url;
+      if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+        imageUrls = (product.images.map((img: unknown) => {
+          const imgUrl = typeof img === 'string' ? img : (img as Record<string, unknown>)?.url as string;
           if (!imgUrl) return null;
-          if (imgUrl.startsWith('http')) return imgUrl;
-          return `${BACKEND_URL}${imgUrl}`;
-        }).filter(Boolean);
+          const resolved = (imgUrl as string).startsWith('http') ? imgUrl : `${BACKEND_URL}${imgUrl}`;
+            return resolved;
+        }).filter(Boolean) as string[]);
       } else if (product.image) {
         // Fallback to single image field
-        const imgUrl = product.image.startsWith('http') ? product.image : `${BACKEND_URL}${product.image}`;
-        imageUrls = [imgUrl];
+        const imgStr = product.image as string;
+  const resolved = imgStr.startsWith('http') ? imgStr : `${BACKEND_URL}${imgStr}`;
+  imageUrls = [resolved];
       }
 
       // Ensure at least one valid image
@@ -73,37 +74,42 @@ export async function GET(request: NextRequest) {
         originalPrice: product.originalPrice,
         description: product.description,
         shortDescription: product.shortDescription,
-        category: product.category?.name || 'Uncategorized',
+        category: ((product.category as Record<string, unknown>)?.name as string) || 'Uncategorized',
         brand: 'Aphrodite', // Default brand
-        rating: product.rating?.average || 0,
-        reviewCount: product.rating?.count || 0,
+        rating: ((product.rating as Record<string, unknown>)?.average as number) || 0,
+        reviewCount: ((product.rating as Record<string, unknown>)?.count as number) || 0,
         images: imageUrls,
-        colors: product.colors || [],
-        sizes: product.sizes || [],
-        inStock: (product.stock || 0) > 0,
-        stockCount: product.stock || 0,
-        tags: product.tags || [],
-        featured: product.isFeatured || false,
-        isOnSale: product.isOnSale || false,
+        colors: (product.colors as string[]) || [],
+        sizes: (product.sizes as string[]) || [],
+        inStock: ((product.stock as number) || 0) > 0,
+        stockCount: (product.stock as number) || 0,
+        tags: (product.tags as string[]) || [],
+        featured: (product.isFeatured as boolean) || false,
+        isOnSale: (product.isOnSale as boolean) || false,
         createdAt: product.createdAt,
         discount: product.originalPrice
-          ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+          ? Math.round((((product.originalPrice as number) - (product.price as number)) / (product.originalPrice as number)) * 100)
           : 0,
-        availability: (product.stock || 0) > 0
-          ? ((product.stock || 0) > 5 ? 'In Stock' : 'Limited Stock')
+        availability: ((product.stock as number) || 0) > 0
+          ? (((product.stock as number) || 0) > 5 ? 'In Stock' : 'Limited Stock')
           : 'Out of Stock'
       };
     });
 
+    const currentPage = parseInt(page);
+    const pageLimit = parseInt(limit);
+    const backendPagination = data.pagination;
+    const totalProducts = backendPagination?.total || transformedProducts.length;
+
     return NextResponse.json({
       products: transformedProducts,
-      pagination: data.pagination || {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total: transformedProducts.length,
-        totalPages: Math.ceil(transformedProducts.length / parseInt(limit)),
-        hasNext: false,
-        hasPrev: false
+      pagination: {
+        page: currentPage,
+        limit: pageLimit,
+        total: totalProducts,
+        totalPages: Math.ceil(totalProducts / pageLimit),
+        hasNext: currentPage < Math.ceil(totalProducts / pageLimit),
+        hasPrev: currentPage > 1
       },
       filters: {
         categories: [],

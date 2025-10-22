@@ -42,14 +42,14 @@ export default function CenterNavbar() {
 
   // Product database for search
   const allProducts = [
-    { id: 1, name: "PS England Shoes", price: 37.24, category: "Shoes", image: "https://i.postimg.cc/8CmBZH5N/shoes.webp", rating: 4 },
-    { id: 2, name: "PS England Jacket", price: 17.24, category: "Clothing", image: "https://i.postimg.cc/76X9ZV8m/Screenshot_from_2022-06-03_18-45-12.png", rating: 2 },
-    { id: 3, name: "PS England Shirt", price: 27.24, category: "Clothing", image: "https://i.postimg.cc/j2FhzSjf/bs2.png", rating: 4 },
-    { id: 4, name: "PS England Sneakers", price: 43.67, category: "Shoes", image: "https://i.postimg.cc/QtjSDzPF/bs3.png", rating: 5 },
-    { id: 5, name: "PS England T-Shirt", price: 10.23, category: "Clothing", image: "https://i.postimg.cc/fbnB2yfj/na1.png", rating: 5 },
-    { id: 6, name: "PS England Bag", price: 9.28, category: "Accessories", image: "https://i.postimg.cc/zD02zJq8/na2.png", rating: 1 },
-    { id: 7, name: "PS England Sunglass", price: 6.24, category: "Accessories", image: "https://i.postimg.cc/Dfj5VBcz/sunglasses1.jpg", rating: 5 },
-    { id: 8, name: "PS England Boots", price: 43.67, category: "Shoes", image: "https://i.postimg.cc/FszW12Kc/na4.png", rating: 5 },
+    { id: 1, name: "Aphrodite Shoes", price: 37.24, category: "Shoes", image: "https://i.postimg.cc/8CmBZH5N/shoes.webp", rating: 4 },
+    { id: 2, name: "Aphrodite Jacket", price: 17.24, category: "Clothing", image: "https://i.postimg.cc/76X9ZV8m/Screenshot_from_2022-06-03_18-45-12.png", rating: 2 },
+    { id: 3, name: "Aphrodite Shirt", price: 27.24, category: "Clothing", image: "https://i.postimg.cc/j2FhzSjf/bs2.png", rating: 4 },
+    { id: 4, name: "Aphrodite Sneakers", price: 43.67, category: "Shoes", image: "https://i.postimg.cc/QtjSDzPF/bs3.png", rating: 5 },
+    { id: 5, name: "Aphrodite T-Shirt", price: 10.23, category: "Clothing", image: "https://i.postimg.cc/fbnB2yfj/na1.png", rating: 5 },
+    { id: 6, name: "Aphrodite Bag", price: 9.28, category: "Accessories", image: "https://i.postimg.cc/zD02zJq8/na2.png", rating: 1 },
+    { id: 7, name: "Aphrodite Sunglasses", price: 6.24, category: "Accessories", image: "https://i.postimg.cc/Dfj5VBcz/sunglasses1.jpg", rating: 5 },
+    { id: 8, name: "Aphrodite Boots", price: 43.67, category: "Shoes", image: "https://i.postimg.cc/FszW12Kc/na4.png", rating: 5 },
     { id: 9, name: "Designer Jacket", price: 89.99, category: "Clothing", image: "https://i.postimg.cc/76X9ZV8m/Screenshot_from_2022-06-03_18-45-12.png", rating: 5 },
     { id: 10, name: "Casual Shirt", price: 27.24, category: "Clothing", image: "https://i.postimg.cc/j2FhzSjf/bs2.png", rating: 4 },
     { id: 11, name: "Premium T-Shirt", price: 15.99, category: "Clothing", image: "https://i.postimg.cc/fbnB2yfj/na1.png", rating: 4 },

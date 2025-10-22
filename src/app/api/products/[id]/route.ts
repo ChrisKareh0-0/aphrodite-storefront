@@ -43,11 +43,11 @@ export async function GET(
 
     // Transform backend data to match frontend expectations
     // Process images with fallback
-    let images = product.images?.map((img: any) => {
-      const imgUrl = typeof img === 'string' ? img : img?.url;
+    let images = product.images?.map((img: unknown) => {
+      const imgUrl = typeof img === 'string' ? img : (img as Record<string, unknown>)?.url as string;
       if (!imgUrl) return null;
-      if (imgUrl.startsWith('http')) return imgUrl;
-      return `${BACKEND_URL}${imgUrl}`;
+  const resolved = (imgUrl as string).startsWith('http') ? imgUrl : `${BACKEND_URL}${imgUrl}`;
+  return resolved;
     }).filter(Boolean) || [];
 
     // Ensure at least one valid image
@@ -64,7 +64,7 @@ export async function GET(
       description: product.description,
       shortDescription: product.shortDescription,
       category: product.category?.name || 'Uncategorized',
-      brand: 'PS England', // Default brand if not in backend
+  brand: 'Aphrodite', // Default brand if not in backend
       rating: product.rating?.average || 0,
       reviewCount: product.rating?.count || 0,
       images,

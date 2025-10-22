@@ -125,7 +125,8 @@ export default function CategoriesGallery() {
         })
       );
 
-      setCategories(processedCategories);
+  // Only show categories with products
+  setCategories(processedCategories.filter(cat => cat.products && cat.products.length > 0));
     } catch (error) {
       console.error('Error fetching categories:', error);
       // Fallback to empty categories
@@ -257,7 +258,7 @@ export default function CategoriesGallery() {
                   <div className="categories-gallery__products-grid">
                     {category.products.map((product, pidx) => (
                       <div key={pidx} className="categories-gallery__product">
-                        <div className="categories-gallery__product-image" onClick={() => handleProductClick(product.slug || product.id)}>
+                        <div className="categories-gallery__product-image" onClick={() => handleProductClick(product.slug || String(product.id))}>
                           <Image src={product.images[0]} alt={product.name} width={200} height={200} />
                           <div className="categories-gallery__product-overlay">
                             <button className="categories-gallery__product-btn">

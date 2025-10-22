@@ -111,9 +111,9 @@ export default function ProductCarousel() {
           type: "clothing",
           category: "Clothing",
           bestSellers: [
-            { id: 1, name: "PS England Jacket", price: 17.24, rating: 4, images: ["https://i.postimg.cc/76X9ZV8m/Screenshot_from_2022-06-03_18-45-12.png"], reviewCount: 100, category: "Clothing" },
-            { id: 2, name: "PS England Shirt", price: 27.24, rating: 5, images: ["https://i.postimg.cc/j2FhzSjf/bs2.png"], reviewCount: 85, category: "Clothing" },
-            { id: 3, name: "PS England T-Shirt", price: 10.23, rating: 5, images: ["https://i.postimg.cc/fbnB2yfj/na1.png"], reviewCount: 156, category: "Clothing" }
+            { id: 1, name: "Aphrodite Jacket", price: 17.24, rating: 4, images: ["https://i.postimg.cc/76X9ZV8m/Screenshot_from_2022-06-03_18-45-12.png"], reviewCount: 100, category: "Clothing" },
+            { id: 2, name: "Aphrodite Shirt", price: 27.24, rating: 5, images: ["https://i.postimg.cc/j2FhzSjf/bs2.png"], reviewCount: 85, category: "Clothing" },
+            { id: 3, name: "Aphrodite T-Shirt", price: 10.23, rating: 5, images: ["https://i.postimg.cc/fbnB2yfj/na1.png"], reviewCount: 156, category: "Clothing" }
           ]
         }
       ];

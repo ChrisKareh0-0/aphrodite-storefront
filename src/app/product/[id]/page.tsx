@@ -46,19 +46,19 @@ export async function generateMetadata({ params }: ProductPageProps) {
 
     const mockProducts: Record<number, MockProduct> = {
       1: {
-        name: "PS England Premium Jacket",
+        name: "Aphrodite Premium Jacket",
         description: "Discover our premium clothing collection featuring the latest trends in fashion.",
         price: 89.99,
         images: ["https://i.postimg.cc/76X9ZV8m/Screenshot_from_2022-06-03_18-45-12.png"]
       },
       2: {
-        name: "PS England Casual Shirt",
+        name: "Aphrodite Casual Shirt",
         description: "A comfortable and stylish casual shirt perfect for everyday wear.",
         price: 27.24,
         images: ["https://i.postimg.cc/j2FhzSjf/bs2.png"]
       },
       3: {
-        name: "PS England Classic Shoes",
+        name: "Aphrodite Classic Shoes",
         description: "Step into style with our classic shoes.",
         price: 37.24,
         images: ["https://i.postimg.cc/8CmBZH5N/shoes.webp"]

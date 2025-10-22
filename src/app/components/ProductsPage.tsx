@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import toast from 'react-hot-toast';
 
@@ -148,11 +147,6 @@ export default function ProductsPage() {
     setCurrentPage(1);
   };
 
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <i key={i} className={`bx ${i < rating ? 'bxs-star' : 'bx-star'}`}></i>
-    ));
-  };
 
   if (error) {
     return (
@@ -365,12 +359,17 @@ export default function ProductsPage() {
                       onClick={() => handleProductClick(product.slug || String(product.id))}
                     >
                       <div className="product-image">
-                        <Image
-                          src={product.images?.[0] || 'https://via.placeholder.com/300x300?text=No+Image'}
-                          alt={product.name}
-                          width={300}
-                          height={300}
-                        />
+                        {product.images?.[0] ? (
+                          <img
+                            src={product.images[0]}
+                            alt={product.name}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                          />
+                        ) : (
+                          <div style={{ width: '100%', height: '100%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <span style={{ color: '#cbd5e1' }}>No Image</span>
+                          </div>
+                        )}
                         {product.discount > 0 && (
                           <span className="discount-badge">-{product.discount}%</span>
                         )}
@@ -385,12 +384,6 @@ export default function ProductsPage() {
                       <div className="product-info">
                         <div className="product-category">{product.category}</div>
                         <h3 className="product-name">{product.name}</h3>
-                        <div className="product-rating">
-                          <div className="stars">
-                            {renderStars(Math.floor(product.rating))}
-                          </div>
-                          <span className="review-count">({product.reviewCount})</span>
-                        </div>
                         <div className="product-price">
                           <span className="current-price">${product.price}</span>
                           {product.originalPrice && (

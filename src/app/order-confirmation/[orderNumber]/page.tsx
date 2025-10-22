@@ -108,7 +108,7 @@ export default function OrderConfirmationPage() {
             <i className="bx bx-check-circle"></i>
           </div>
           <h1>Order Confirmed!</h1>
-          <p>Thank you for your order. We've received your order and will begin processing it shortly.</p>
+          <p>Thank you for your order. We&apos;ve received your order and will begin processing it shortly.</p>
         </div>
 
         <div className="order-info-card">
@@ -254,17 +254,17 @@ export default function OrderConfirmationPage() {
         </div>
 
         <div className="next-steps">
-          <h3>What's Next?</h3>
+          <h3>What&apos;s Next?</h3>
           <div className="steps-grid">
             <div className="step-card">
               <i className="bx bx-envelope"></i>
               <h4>Email Confirmation</h4>
-              <p>You'll receive an email confirmation at {order.customer.email}</p>
+              <p>You&apos;ll receive an email confirmation at {order.customer.email}</p>
             </div>
             <div className="step-card">
               <i className="bx bx-package"></i>
               <h4>Order Processing</h4>
-              <p>We'll start processing your order within 24 hours</p>
+              <p>We&apos;ll start processing your order within 24 hours</p>
             </div>
             <div className="step-card">
               <i className="bx bx-truck"></i>

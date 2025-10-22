@@ -111,7 +111,7 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
             style={{ animationDelay: `${index * 80}ms` }}
           >
             {isNewCollection && <span className="new-badge">NEW</span>}
-            <div className="product-image-wrapper" onClick={() => handleProductClick(product.slug || product.id)}>
+            <div className="product-image-wrapper" onClick={() => handleProductClick(product.slug || String(product.id))}>
               <Image
                 src={
                   product.images && product.images.length > 0

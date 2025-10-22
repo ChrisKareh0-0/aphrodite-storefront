@@ -131,7 +131,7 @@ export default function Landing() {
               <img src="https://i.postimg.cc/8CmBZH5N/shoes.webp" alt="img" />
               <div className="best-p1-txt">
                 <div className="name-of-p">
-                  <p>PS England Shoes</p>
+                  <p>Aphrodite Shoes</p>
                 </div>
                 <div className="rating">
                   <i className="bx bxs-star"></i>
@@ -162,7 +162,7 @@ export default function Landing() {
               />
               <div className="best-p1-txt">
                 <div className="name-of-p">
-                  <p>PS England Jacket</p>
+                  <p>Aphrodite Jacket</p>
                 </div>
                 <div className="rating">
                   <i className="bx bxs-star"></i>
@@ -190,7 +190,7 @@ export default function Landing() {
               <img src="https://i.postimg.cc/j2FhzSjf/bs2.png" alt="img" />
               <div className="best-p1-txt">
                 <div className="name-of-p">
-                  <p>PS England Shirt</p>
+                  <p>Aphrodite Shirt</p>
                 </div>
                 <div className="rating">
                   <i className="bx bxs-star"></i>
@@ -218,7 +218,7 @@ export default function Landing() {
               <img src="https://i.postimg.cc/QtjSDzPF/bs3.png" alt="img" />
               <div className="best-p1-txt">
                 <div className="name-of-p">
-                  <p>PS England Shoes</p>
+                  <p>Aphrodite Shoes</p>
                 </div>
                 <div className="rating">
                   <i className="bx bxs-star"></i>
@@ -251,7 +251,7 @@ export default function Landing() {
               <img src="https://i.postimg.cc/fbnB2yfj/na1.png" alt="img" />
               <div className="best-p1-txt">
                 <div className="name-of-p">
-                  <p>PS England T-Shirt</p>
+                  <p>Aphrodite T-Shirt</p>
                 </div>
                 <div className="rating">
                   <i className="bx bxs-star"></i>
@@ -279,7 +279,7 @@ export default function Landing() {
               <img src="https://i.postimg.cc/zD02zJq8/na2.png" alt="img" />
               <div className="best-p1-txt">
                 <div className="name-of-p">
-                  <p>PS England Bag</p>
+                  <p>Aphrodite Bag</p>
                 </div>
                 <div className="rating">
                   <i className="bx bxs-star"></i>
@@ -307,7 +307,7 @@ export default function Landing() {
               <img src="https://i.postimg.cc/Dfj5VBcz/sunglasses1.jpg" alt="img" />
               <div className="best-p1-txt">
                 <div className="name-of-p">
-                  <p>PS England Sunglass</p>
+                  <p>Aphrodite Sunglasses</p>
                 </div>
                 <div className="rating">
                   <i className="bx bxs-star"></i>
@@ -335,7 +335,7 @@ export default function Landing() {
               <img src="https://i.postimg.cc/FszW12Kc/na4.png" alt="img" />
               <div className="best-p1-txt">
                 <div className="name-of-p">
-                  <p>PS England Shoes</p>
+                  <p>Aphrodite Shoes</p>
                 </div>
                 <div className="rating">
                   <i className="bx bxs-star"></i>
@@ -368,7 +368,7 @@ export default function Landing() {
               <img src="https://i.postimg.cc/jS7pSQLf/na4.png" alt="img" />
               <div className="best-p1-txt">
                 <div className="name-of-p">
-                  <p>PS England Shoes</p>
+                  <p>Aphrodite Shoes</p>
                 </div>
                 <div className="rating">
                   <i className="bx bxs-star"></i>
@@ -396,7 +396,7 @@ export default function Landing() {
               <img src="https://i.postimg.cc/fbnB2yfj/na1.png" alt="img" />
               <div className="best-p1-txt">
                 <div className="name-of-p">
-                  <p>PS England T-Shirt</p>
+                  <p>Aphrodite T-Shirt</p>
                 </div>
                 <div className="rating">
                   <i className="bx bxs-star"></i>
@@ -424,7 +424,7 @@ export default function Landing() {
               <img src="https://i.postimg.cc/RhVP7YQk/hs1.png" alt="img" />
               <div className="best-p1-txt">
                 <div className="name-of-p">
-                  <p>PS England T-Shirt</p>
+                  <p>Aphrodite T-Shirt</p>
                 </div>
                 <div className="rating">
                   <i className="bx bxs-star"></i>
@@ -452,7 +452,7 @@ export default function Landing() {
               <img src="https://i.postimg.cc/zD02zJq8/na2.png" alt="img" />
               <div className="best-p1-txt">
                 <div className="name-of-p">
-                  <p>PS England Bag</p>
+                  <p>Aphrodite Bag</p>
                 </div>
                 <div className="rating">
                   <i className="bx bxs-star"></i>

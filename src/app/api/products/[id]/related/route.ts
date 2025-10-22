@@ -79,14 +79,15 @@ export async function GET(
 
     // Filter out the current product and limit results
     const relatedProducts = (relatedData.products || [])
-      .filter((p: any) => p.id !== product.id && p.slug !== product.slug)
+      .filter((p: Record<string, unknown>) => p.id !== product.id && p.slug !== product.slug)
       .slice(0, parseInt(limit))
-      .map((p: any) => {
+      .map((p: Record<string, unknown>) => {
         // Process images with fallback
-        let images = p.images?.map((img: string) => {
-          if (!img) return null;
-          if (img.startsWith('http')) return img;
-          return `${BACKEND_URL}${img}`;
+        let images = (p.images as unknown[])?.map((img: unknown) => {
+          const imgStr = typeof img === 'string' ? img : (img as Record<string, unknown>)?.url as string;
+          if (!imgStr) return null;
+          if (imgStr.startsWith('http')) return imgStr;
+          return `${BACKEND_URL}${imgStr}`;
         }).filter(Boolean) || [];
 
         // Ensure at least one valid image
@@ -94,27 +95,31 @@ export async function GET(
           images = ['/placeholder-product.svg'];
         }
 
+        const category = p.category as Record<string, unknown> | undefined;
+        const rating = p.rating as Record<string, unknown> | undefined;
+        const stock = (p.stock as number) || 0;
+
         return {
           id: p.id,
           name: p.name,
           slug: p.slug,
           price: p.price,
           originalPrice: p.originalPrice,
-          category: p.category?.name || 'Uncategorized',
-          rating: p.rating?.average || 0,
-          reviewCount: p.rating?.count || 0,
+          category: category?.name || 'Uncategorized',
+          rating: (rating?.average as number) || 0,
+          reviewCount: (rating?.count as number) || 0,
           images,
           colors: p.colors || [],
           sizes: p.sizes || [],
-          inStock: p.stock > 0,
-          stockCount: p.stock,
+          inStock: stock > 0,
+          stockCount: stock,
           tags: p.tags || [],
           discount: p.originalPrice
-            ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)
+            ? Math.round((((p.originalPrice as number) - (p.price as number)) / (p.originalPrice as number)) * 100)
             : 0,
-          isPopular: (p.rating?.count || 0) > 50,
-          availability: p.stock > 0
-            ? (p.stock > 5 ? 'In Stock' : 'Limited Stock')
+          isPopular: ((rating?.count as number) || 0) > 50,
+          availability: stock > 0
+            ? (stock > 5 ? 'In Stock' : 'Limited Stock')
             : 'Out of Stock'
         };
       });
