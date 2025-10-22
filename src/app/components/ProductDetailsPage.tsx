@@ -57,7 +57,7 @@ interface ProductDetailsPageProps {
 export default function ProductDetailsPage({ productId }: ProductDetailsPageProps) {
   const router = useRouter();
   const { addToCart } = useCart();
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+  const backendUrl = 'https://aphrodite-admin.onrender.com';
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);

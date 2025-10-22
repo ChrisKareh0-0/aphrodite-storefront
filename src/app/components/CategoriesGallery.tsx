@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { BACKEND_URL } from "@/constants";
 
 interface Product {
   id: number | string;
@@ -49,7 +50,6 @@ export default function CategoriesGallery() {
   });
   const galleryRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
   useEffect(() => {
     // Load collection settings and categories once on mount
@@ -62,7 +62,7 @@ export default function CategoriesGallery() {
 
   const fetchCollectionSettings = async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/collection`);
+      const response = await fetch(`${BACKEND_URL}/api/collection`);
       const data = await response.json();
       setCollectionSettings(data);
     } catch (error) {
@@ -75,11 +75,9 @@ export default function CategoriesGallery() {
     try {
       setLoading(true);
 
-    // Fetch categories from backend
-    const categoriesResponse = await fetch(`${backendUrl}/api/categories`);
-      const categoriesData = await categoriesResponse.json();
-
-      if (!categoriesData.categories || categoriesData.categories.length === 0) {
+      // Fetch categories from backend
+      const categoriesResponse = await fetch(`${BACKEND_URL}/api/categories`);
+      const categoriesData = await categoriesResponse.json();      if (!categoriesData.categories || categoriesData.categories.length === 0) {
         setCategories([]);
         return;
       }
@@ -91,12 +89,12 @@ export default function CategoriesGallery() {
       const processedCategories = await Promise.all(
         categoriesData.categories.map(async (cat: BackendCategory, index: number) => {
             try {
-            const productsResponse = await fetch(`${backendUrl}/api/products?category=${cat.slug}&limit=3`);
+            const productsResponse = await fetch(`${BACKEND_URL}/api/products?category=${cat.slug}&limit=3`);
             const productsData = await productsResponse.json();
 
             // Handle relative image paths from backend
             const categoryImage = cat.image
-              ? (cat.image.startsWith('http') ? cat.image : `${backendUrl}${cat.image}`)
+              ? (cat.image.startsWith('http') ? cat.image : `${BACKEND_URL}${cat.image}`)
               : "https://i.postimg.cc/Xqmwr12c/clothing.webp";
 
             return {
@@ -112,7 +110,7 @@ export default function CategoriesGallery() {
           } catch (error) {
             console.error(`Error fetching products for category ${cat.name}:`, error);
             const categoryImage = cat.image
-              ? (cat.image.startsWith('http') ? cat.image : `${backendUrl}${cat.image}`)
+              ? (cat.image.startsWith('http') ? cat.image : `${BACKEND_URL}${cat.image}`)
               : "https://i.postimg.cc/Xqmwr12c/clothing.webp";
 
             return {

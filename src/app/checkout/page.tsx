@@ -7,10 +7,11 @@ import Image from 'next/image';
 import toast from 'react-hot-toast';
 import '../checkout.css';
 
-export default function CheckoutPage() {
+export default function Checkout() {
   const router = useRouter();
   const { cart, getCartTotal, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
+  const backendUrl = 'https://aphrodite-admin.onrender.com';
 
   const [formData, setFormData] = useState({
     name: '',
@@ -73,7 +74,6 @@ export default function CheckoutPage() {
         notes: formData.notes
       };
 
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
       const response = await fetch(`${backendUrl}/api/orders/create`, {
         method: 'POST',
         headers: {

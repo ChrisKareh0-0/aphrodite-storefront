@@ -35,7 +35,7 @@ export default function ProductCarousel() {
   const stageRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+  const backendUrl = 'https://aphrodite-admin.onrender.com';
 
   const [productCategories, setProductCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);

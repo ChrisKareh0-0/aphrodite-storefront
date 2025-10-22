@@ -33,7 +33,7 @@ export default function Landing() {
   });
   const [, setLoading] = useState(true);
 
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+  const backendUrl = 'https://aphrodite-admin.onrender.com';
 
   useEffect(() => {
     (async () => {
