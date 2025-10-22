@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { BACKEND_URL } from "@/constants";
+import { fetchWithConfig } from "@/utils/fetchWithConfig";
 
 interface Product {
   id: number | string;
@@ -71,8 +72,7 @@ export default function CategoriesGallery() {
   const fetchCollectionSettings = async () => {
     try {
       console.log('🔄 Fetching collection settings from:', `${BACKEND_URL}/api/collection`);
-      const response = await fetch(`${BACKEND_URL}/api/collection`);
-      const data = await response.json();
+      const data = await fetchWithConfig('/api/collection');
       console.log('✅ Collection settings data:', data);
       setCollectionSettings(data);
     } catch (error) {
@@ -87,7 +87,14 @@ export default function CategoriesGallery() {
 
       // Fetch categories from backend
       console.log('🔄 Fetching categories from:', `${BACKEND_URL}/api/categories`);
-      const categoriesResponse = await fetch(`${BACKEND_URL}/api/categories`);
+      const categoriesResponse = await fetch(`${BACKEND_URL}/api/categories`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        mode: 'cors',
+      });
       if (!categoriesResponse.ok) {
         throw new Error(`HTTP error! status: ${categoriesResponse.status}`);
       }
@@ -115,7 +122,14 @@ export default function CategoriesGallery() {
         categoriesData.categories.map(async (cat: BackendCategory, index: number) => {
             try {
               console.log(`🔄 Fetching products for category "${cat.name}" from:`, `${BACKEND_URL}/api/products?category=${cat.slug}&limit=3`);
-              const productsResponse = await fetch(`${BACKEND_URL}/api/products?category=${cat.slug}&limit=3`);
+              const productsResponse = await fetch(`${BACKEND_URL}/api/products?category=${cat.slug}&limit=3`, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                mode: 'cors',
+              });
               if (!productsResponse.ok) {
                 throw new Error(`HTTP error! status: ${productsResponse.status}`);
               }
