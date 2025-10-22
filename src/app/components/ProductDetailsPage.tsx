@@ -298,6 +298,10 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                   alt={product.name}
                   width={500}
                   height={500}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&h=600&fit=crop';
+                  }}
                 />
                 <button
                   className={`wishlist-btn ${isWishlisted ? 'active' : ''}`}
@@ -318,6 +322,10 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                       alt={`${product.name} ${index + 1}`}
                       width={100}
                       height={100}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=200&h=200&fit=crop';
+                      }}
                     />
                   </button>
                 ))}

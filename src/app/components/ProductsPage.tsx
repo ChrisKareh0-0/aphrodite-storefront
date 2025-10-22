@@ -365,6 +365,11 @@ export default function ProductsPage() {
                             alt={product.name}
                             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                             loading="lazy"
+                            onError={(e) => {
+                              // Fallback to placeholder if image fails
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop';
+                            }}
                           />
                         ) : (
                           <div style={{ width: '100%', height: '100%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -350,6 +350,10 @@ export default function CategoriesGallery() {
                             alt={product.name}
                             width={200}
                             height={200}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop';
+                            }}
                           />
                           <div className="categories-gallery__product-overlay">
                             <button className="categories-gallery__product-btn">

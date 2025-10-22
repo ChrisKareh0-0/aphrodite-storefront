@@ -348,6 +348,10 @@ export default function ProductCarousel() {
                             alt={product.name}
                             width={100}
                             height={100}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop';
+                            }}
                           />
                           <div className="product-info">
                             <p className="product-name">{product.name}</p>
