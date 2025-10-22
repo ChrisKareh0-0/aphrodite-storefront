@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import toast from 'react-hot-toast';
@@ -57,6 +57,7 @@ interface ProductDetailsPageProps {
 export default function ProductDetailsPage({ productId }: ProductDetailsPageProps) {
   const router = useRouter();
   const { addToCart } = useCart();
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -78,7 +79,8 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
   const fetchProductDetails = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/products/${productId}`);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+  const response = await fetch(`${backendUrl}/api/products/${productId}`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -115,7 +117,8 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
 
   const fetchProductReviews = async () => {
     try {
-      const response = await fetch(`/api/products/${productId}/reviews`);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+  const response = await fetch(`${backendUrl}/api/products/${productId}/reviews`);
 
       if (!response.ok) {
         // Reviews are optional, just log the error
@@ -134,7 +137,8 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
 
   const fetchRelatedProducts = async () => {
     try {
-      const response = await fetch(`/api/products/${productId}/related`);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+  const response = await fetch(`${backendUrl}/api/products/${productId}/related`);
 
       if (!response.ok) {
         console.warn('No related products available');
@@ -195,7 +199,8 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
 
   const toggleWishlist = async () => {
     try {
-      const response = await fetch('/api/wishlist/toggle', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+      const response = await fetch(`${backendUrl}/api/wishlist/toggle`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

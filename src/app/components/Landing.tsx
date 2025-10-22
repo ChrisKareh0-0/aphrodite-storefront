@@ -31,12 +31,14 @@ export default function Landing() {
     buttonText: 'New Collection',
     buttonLink: '#new-collection'
   });
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
+
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
   useEffect(() => {
-    const fetchHeroData = async () => {
+    (async () => {
       try {
-        const response = await fetch('/api/hero');
+        const response = await fetch(`${backendUrl}/api/hero`);
         const data = await response.json();
         setHeroData(data);
       } catch (error) {
@@ -45,9 +47,7 @@ export default function Landing() {
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchHeroData();
+    })();
 
     const handleClick = (event: Event) => {
       const target = event.currentTarget as HTMLAnchorElement;
@@ -62,6 +62,7 @@ export default function Landing() {
     const anchors = Array.from(document.querySelectorAll<HTMLAnchorElement>(".center-navbar__nav-item, a[href^='#']"));
     anchors.forEach((a) => a.addEventListener("click", handleClick));
     return () => anchors.forEach((a) => a.removeEventListener("click", handleClick));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

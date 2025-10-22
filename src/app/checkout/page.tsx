@@ -73,7 +73,8 @@ export default function CheckoutPage() {
         notes: formData.notes
       };
 
-      const response = await fetch('/api/orders/create', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+      const response = await fetch(`${backendUrl}/api/orders/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

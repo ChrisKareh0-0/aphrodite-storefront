@@ -35,6 +35,7 @@ export default function ProductCarousel() {
   const stageRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
   const [productCategories, setProductCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,9 +56,9 @@ export default function ProductCarousel() {
       setLoading(true);
 
       const categoriesData = await Promise.all([
-        fetch('/api/products?category=Clothing&limit=3&sortBy=rating').then(res => res.json()),
-        fetch('/api/products?category=Shoes&limit=3&sortBy=rating').then(res => res.json()),
-        fetch('/api/products?category=Accessories&limit=3&sortBy=rating').then(res => res.json()),
+        fetch(`${backendUrl}/api/products?category=Clothing&limit=3&sortBy=rating`).then(res => res.json()),
+        fetch(`${backendUrl}/api/products?category=Shoes&limit=3&sortBy=rating`).then(res => res.json()),
+        fetch(`${backendUrl}/api/products?category=Accessories&limit=3&sortBy=rating`).then(res => res.json()),
       ]);
 
       const categories = [

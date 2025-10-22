@@ -49,15 +49,20 @@ export default function CategoriesGallery() {
   });
   const galleryRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
   useEffect(() => {
-    fetchCollectionSettings();
-    fetchCategories();
+    // Load collection settings and categories once on mount
+    (async () => {
+      await fetchCollectionSettings();
+      await fetchCategories();
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchCollectionSettings = async () => {
     try {
-      const response = await fetch('/api/collection');
+      const response = await fetch(`${backendUrl}/api/collection`);
       const data = await response.json();
       setCollectionSettings(data);
     } catch (error) {
@@ -70,8 +75,8 @@ export default function CategoriesGallery() {
     try {
       setLoading(true);
 
-      // Fetch categories from backend
-      const categoriesResponse = await fetch('/api/categories');
+    // Fetch categories from backend
+    const categoriesResponse = await fetch(`${backendUrl}/api/categories`);
       const categoriesData = await categoriesResponse.json();
 
       if (!categoriesData.categories || categoriesData.categories.length === 0) {
@@ -79,15 +84,14 @@ export default function CategoriesGallery() {
         return;
       }
 
-      // Define color palette for categories
-      const colors = ["#27323c", "#19304a", "#2b2533", "#1a3a52", "#2d1f33", "#324a5e"];
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+  // Define color palette for categories
+  const colors = ["#27323c", "#19304a", "#2b2533", "#1a3a52", "#2d1f33", "#324a5e"];
 
       // Fetch products for each category
       const processedCategories = await Promise.all(
         categoriesData.categories.map(async (cat: BackendCategory, index: number) => {
-          try {
-            const productsResponse = await fetch(`/api/products?category=${cat.slug}&limit=3`);
+            try {
+            const productsResponse = await fetch(`${backendUrl}/api/products?category=${cat.slug}&limit=3`);
             const productsData = await productsResponse.json();
 
             // Handle relative image paths from backend
