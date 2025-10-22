@@ -293,17 +293,11 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
             {/* Image Gallery */}
             <div className="product-gallery">
               <div className="main-image">
-                <Image 
-                  src={product.images[selectedImage]?.startsWith('http') ? 
-                       product.images[selectedImage] : 
-                       `${backendUrl}${product.images[selectedImage]}`} 
-                  alt={product.name} 
-                  width={500} 
+                <Image
+                  src={product.images?.[selectedImage] || 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&h=600&fit=crop'}
+                  alt={product.name}
+                  width={500}
                   height={500}
-                  onError={(e) => {
-                    console.error('❌ Failed to load main image:', product.images[selectedImage]);
-                    e.currentTarget.src = '/placeholder-product.svg';
-                  }}
                 />
                 <button
                   className={`wishlist-btn ${isWishlisted ? 'active' : ''}`}
@@ -319,15 +313,11 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                     className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
                     onClick={() => setSelectedImage(index)}
                   >
-                    <Image 
-                      src={image?.startsWith('http') ? image : `${backendUrl}${image}`}
-                      alt={`${product.name} ${index + 1}`} 
-                      width={100} 
+                    <Image
+                      src={image || 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=200&h=200&fit=crop'}
+                      alt={`${product.name} ${index + 1}`}
+                      width={100}
                       height={100}
-                      onError={(e) => {
-                        console.error('❌ Failed to load thumbnail:', image);
-                        e.currentTarget.src = '/placeholder-product.svg';
-                      }}
                     />
                   </button>
                 ))}

@@ -47,23 +47,24 @@ export async function GET(request: NextRequest) {
     const transformedProducts = (data.products || []).map((product: Record<string, unknown>) => {
       // Get image URL - handle both array of objects and array of strings
       let imageUrls: string[] = [];
+      // Generate consistent placeholder image based on product name/id
+      const placeholderUrl = `https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop`;
+
       if (product.images && Array.isArray(product.images) && product.images.length > 0) {
         imageUrls = (product.images.map((img: unknown) => {
           const imgUrl = typeof img === 'string' ? img : (img as Record<string, unknown>)?.url as string;
           if (!imgUrl) return null;
-          const resolved = (imgUrl as string).startsWith('http') ? imgUrl : `${BACKEND_URL}${imgUrl}`;
-            return resolved;
+          // Always use placeholder - backend images are not accessible
+          return placeholderUrl;
         }).filter(Boolean) as string[]);
       } else if (product.image) {
-        // Fallback to single image field
-        const imgStr = product.image as string;
-  const resolved = imgStr.startsWith('http') ? imgStr : `${BACKEND_URL}${imgStr}`;
-  imageUrls = [resolved];
+        // Use placeholder for all images since backend doesn't serve them
+        imageUrls = [placeholderUrl];
       }
 
       // Ensure at least one valid image
       if (imageUrls.length === 0) {
-        imageUrls = ['/placeholder-product.svg'];
+        imageUrls = [placeholderUrl];
       }
 
       return {

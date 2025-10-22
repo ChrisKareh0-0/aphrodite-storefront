@@ -345,17 +345,11 @@ export default function CategoriesGallery() {
                     {category.products.map((product, pidx) => (
                       <div key={pidx} className="categories-gallery__product">
                         <div className="categories-gallery__product-image" onClick={() => handleProductClick(product.slug || String(product.id))}>
-                          <Image 
-                            src={product.images[0]?.startsWith('http') ? product.images[0] : `${BACKEND_URL}${product.images[0]}`} 
-                            alt={product.name} 
-                            width={200} 
+                          <Image
+                            src={product.images?.[0] || 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop'}
+                            alt={product.name}
+                            width={200}
                             height={200}
-                            onError={(e) => {
-                              // Log the failed image URL
-                              console.error('❌ Failed to load image:', product.images[0]);
-                              // Fallback to placeholder
-                              e.currentTarget.src = '/placeholder-product.svg';
-                            }}
                           />
                           <div className="categories-gallery__product-overlay">
                             <button className="categories-gallery__product-btn">

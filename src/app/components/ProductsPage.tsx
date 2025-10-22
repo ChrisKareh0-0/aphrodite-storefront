@@ -361,14 +361,10 @@ export default function ProductsPage() {
                       <div className="product-image">
                         {product.images?.[0] ? (
                           <img
-                            src={`/api/images?url=${encodeURIComponent(product.images[0])}`}
+                            src={product.images[0]}
                             alt={product.name}
                             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                            onError={(e) => {
-                              console.error('❌ Failed to load product image:', product.images[0]);
-                              const target = e.target as HTMLImageElement;
-                              target.src = '/placeholder-product.svg';
-                            }}
+                            loading="lazy"
                           />
                         ) : (
                           <div style={{ width: '100%', height: '100%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

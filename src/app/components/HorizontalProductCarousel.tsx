@@ -113,13 +113,7 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
             {isNewCollection && <span className="new-badge">NEW</span>}
             <div className="product-image-wrapper" onClick={() => handleProductClick(product.slug || String(product.id))}>
               <Image
-                src={
-                  product.images && product.images.length > 0
-                    ? (typeof product.images[0] === 'string'
-                      ? product.images[0]
-                      : (product.images[0] as { url: string }).url)
-                    : 'https://i.postimg.cc/t403yfn9/home2.jpg'
-                }
+                src={(typeof product.images?.[0] === 'string' ? product.images[0] : (product.images?.[0] as any)?.url) || 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop'}
                 alt={product.name}
                 width={250}
                 height={200}

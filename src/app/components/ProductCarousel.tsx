@@ -343,21 +343,11 @@ export default function ProductCarousel() {
                     <div className="best-sellers-grid">
                       {category.bestSellers.map((product: Product, pidx: number) => (
                         <div key={pidx} className="product-item" onClick={() => handleProductClick(product.id)}>
-                          <Image 
-                            src={
-                              product.images ? 
-                                (product.images[0]?.startsWith('http') ? 
-                                  product.images[0] : 
-                                  `${backendUrl}${product.images[0]}`) :
-                                ((product as Product & { image: string }).image)
-                            } 
-                            alt={product.name} 
-                            width={100} 
+                          <Image
+                            src={product.images?.[0] || 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop'}
+                            alt={product.name}
+                            width={100}
                             height={100}
-                            onError={(e) => {
-                              console.error('❌ Failed to load carousel product image:', product.images?.[0]);
-                              e.currentTarget.src = '/placeholder-product.svg';
-                            }}
                           />
                           <div className="product-info">
                             <p className="product-name">{product.name}</p>
