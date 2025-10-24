@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { BACKEND_URL, getImageUrl } from '@/constants';
+import { BACKEND_URL } from '@/constants';
 
 export async function GET(request: NextRequest) {
   try {
@@ -47,19 +47,33 @@ export async function GET(request: NextRequest) {
     const transformedProducts = (data.products || []).map((product: Record<string, unknown>) => {
       // Get image URL - handle both array of objects and array of strings
       let imageUrls: string[] = [];
-      if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+      if (product.images && Array.isArray(product.images)) {
         imageUrls = product.images.map((img: unknown) => {
-          const imgUrl = typeof img === 'string' ? img : (img as Record<string, unknown>)?.url as string;
-          return getImageUrl(imgUrl || '');
+          if (typeof img === 'string') {
+            return img.startsWith('http') ? img : `${BACKEND_URL}${img.startsWith('/') ? '' : '/'}${img}`;
+          } else if (typeof img === 'object' && img !== null) {
+            const url = (img as Record<string, unknown>)?.url as string;
+            if (url) {
+              return url.startsWith('http') ? url : `${BACKEND_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+            }
+          }
+          return null;
         }).filter(Boolean);
-      } else if (product.image) {
-        imageUrls = [getImageUrl(product.image as string)];
+      }
+
+      // Fallback to single image if available
+      if (imageUrls.length === 0 && product.image) {
+        const imgUrl = product.image as string;
+        imageUrls = [imgUrl.startsWith('http') ? imgUrl : `${BACKEND_URL}${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`];
       }
 
       // Ensure at least one valid image
       if (imageUrls.length === 0) {
         imageUrls = ['/images/placeholder.svg'];
       }
+
+      // Log the image URLs for debugging
+      console.log(`Product ${product.name} images:`, imageUrls);
 
       // Calculate total stock from stock array
       const stockArray = Array.isArray(product.stock) ? product.stock : [];

@@ -40,14 +40,22 @@ export default function Landing() {
       try {
         console.log('🔄 Fetching hero data from:', `/api/hero`);
         const response = await fetch(`/api/hero`);
+        console.log('📡 Hero API Response Status:', response.status);
         const data = await response.json();
         console.log('✅ Hero data:', data);
-        setHeroData({
+        console.log('🖼️ Raw hero image URL:', data.imageUrl);
+        const processedImageUrl = getImageUrl(data.imageUrl) || data.imageUrl;
+        console.log('🖼️ Processed hero image URL:', processedImageUrl);
+        
+        const newHeroData = {
           ...data,
-          imageUrl: getImageUrl(data.imageUrl) || data.imageUrl
-        });
+          imageUrl: processedImageUrl
+        };
+        console.log('🎯 Setting hero data:', newHeroData);
+        setHeroData(newHeroData);
       } catch (error) {
-        console.error('Error fetching hero data:', error);
+        console.error('❌ Error fetching hero data:', error);
+        console.log('⚠️ Using default hero data:', heroData);
         // Keep default values on error
       } finally {
         setLoading(false);

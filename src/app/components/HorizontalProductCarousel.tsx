@@ -39,11 +39,28 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
     const fetchProducts = async () => {
       try {
         setLoading(true);
+        console.log(`🔄 Fetching products for "${title}" from:`, `/api/products?${query}`);
         const res = await fetch(`/api/products?${query}`);
+        console.log(`📡 Products API Response Status:`, res.status);
         const data = await res.json();
+        console.log(`✅ Products data for "${title}":`, data);
+        
+        if (!data.products || !Array.isArray(data.products)) {
+          console.error(`❌ Invalid products response format for "${title}":`, data);
+          return;
+        }
+
+        // Log each product's image URLs
+        data.products.forEach((product: Product) => {
+          console.log(`🖼️ Product "${product.name}" images:`, {
+            raw: product.images,
+            first: product.images?.[0]
+          });
+        });
+
         setProducts(data.products || []);
       } catch (error) {
-        console.error(`Error fetching ${title}:`, error);
+        console.error(`❌ Error fetching ${title}:`, error);
       } finally {
         setLoading(false);
       }
@@ -116,14 +133,15 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
             {isNewCollection && <span className="new-badge">NEW</span>}
             <div className="product-image-wrapper" onClick={() => handleProductClick(product.slug || String(product.id))}>
               <Image
-                src={typeof product.images?.[0] === 'string' 
-                  ? product.images[0]
-                  : product.images?.[0]?.url 
-                    ? product.images[0].url 
-                    : PLACEHOLDER_IMAGE}
+                src={product.images?.[0] || PLACEHOLDER_IMAGE}
                 alt={product.name}
                 width={250}
                 height={200}
+                onError={(e) => {
+                  console.error(`Failed to load image for product ${product.name}:`, product.images?.[0]);
+                  const imgElement = e.target as HTMLImageElement;
+                  imgElement.src = PLACEHOLDER_IMAGE;
+                }}
               />
               <div className="product-overlay">
                 <button className="overlay-btn" aria-label="Quick view">
