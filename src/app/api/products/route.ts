@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { BACKEND_URL } from '@/constants';
+import { BACKEND_URL, getImageUrl } from '@/constants';
 
 export async function GET(request: NextRequest) {
   try {
@@ -48,21 +48,17 @@ export async function GET(request: NextRequest) {
       // Get image URL - handle both array of objects and array of strings
       let imageUrls: string[] = [];
       if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-        imageUrls = (product.images.map((img: unknown) => {
+        imageUrls = product.images.map((img: unknown) => {
           const imgUrl = typeof img === 'string' ? img : (img as Record<string, unknown>)?.url as string;
-          if (!imgUrl) return null;
-          // Proxy the image through our API endpoint
-          return `/api/image-proxy?path=${encodeURIComponent(imgUrl)}`;
-        }).filter(Boolean) as string[]);
+          return getImageUrl(imgUrl || '');
+        }).filter(Boolean);
       } else if (product.image) {
-        // Proxy single image
-        const imgStr = product.image as string;
-        imageUrls = [`/api/image-proxy?path=${encodeURIComponent(imgStr)}`];
+        imageUrls = [getImageUrl(product.image as string)];
       }
 
       // Ensure at least one valid image
       if (imageUrls.length === 0) {
-        imageUrls = ['https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop'];
+        imageUrls = ['/images/placeholder.svg'];
       }
 
       return {

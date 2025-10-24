@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import toast from 'react-hot-toast';
+import { PLACEHOLDER_IMAGE } from '@/constants';
 
 interface Product {
   id: number | string;
@@ -92,6 +93,7 @@ export default function ProductsPage() {
       setProducts(data.products);
       setPagination(data.pagination);
       setFilters(data.filters);
+      console.log("[!] ALL DATA",data)
 
       // Update URL without page reload
       const url = new URL(window.location.href);
@@ -368,7 +370,7 @@ export default function ProductsPage() {
                             onError={(e) => {
                               // Fallback to placeholder if image fails
                               const target = e.target as HTMLImageElement;
-                              target.src = 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop';
+                              target.src = PLACEHOLDER_IMAGE;
                             }}
                           />
                         ) : (

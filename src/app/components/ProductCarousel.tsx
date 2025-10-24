@@ -128,8 +128,8 @@ export default function ProductCarousel() {
     router.push(`/product/${productId}`);
   };
 
-  const handleViewAllClick = (category: string) => {
-    router.push(`/products?category=${category}`);
+  const handleViewAllClick = (categoryName: string) => {
+    router.push(`/products?category=${encodeURIComponent(categoryName)}`);
   };
 
   const appendControls = () => {
@@ -312,7 +312,7 @@ export default function ProductCarousel() {
               data-bg={category.bgColor}
             >
               <div className="content" data-type={category.type}>
-                <div className="content__left" onClick={() => handleViewAllClick(category.category)}>
+                <div className="content__left" onClick={() => handleViewAllClick(category.name)}>
                   <h1>{category.name}<br/><span>{category.continent}</span></h1>
                 </div>
                 <div className="content__right">

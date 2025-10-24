@@ -1,6 +1,23 @@
 import { NextResponse } from 'next/server';
-
 import { BACKEND_URL } from '@/constants';
+
+interface BackendCategory {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string | null;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string | null;
+}
 
 export async function GET() {
   try {
@@ -13,8 +30,17 @@ export async function GET() {
     }
 
     const data = await response.json();
+    const transformedData = {
+      categories: data.categories.map((category: BackendCategory): Category => ({
+        id: category._id,
+        name: category.name,
+        slug: category.slug,
+        description: category.description,
+        image: category.image
+      }))
+    };
 
-    return NextResponse.json(data);
+    return NextResponse.json(transformedData);
   } catch (error) {
     console.error('Error fetching categories:', error);
     return NextResponse.json(

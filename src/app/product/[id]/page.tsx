@@ -2,14 +2,13 @@ import ProductDetailsPage from "../../components/ProductDetailsPage";
 import "../../product-details.css";
 
 interface ProductPageProps {
-  params: Promise<{
+  params: {
     id: string;
-  }>;
+  };
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
-  const resolvedParams = await params;
-  const productSlug = resolvedParams.id;
+export default function ProductPage({ params }: ProductPageProps) {
+  const productSlug = params.id;
 
   if (!productSlug) {
     return (
@@ -28,8 +27,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: ProductPageProps) {
-  const resolvedParams = await params;
-  const productId = parseInt(resolvedParams.id);
+  const productId = parseInt(params.id);
 
   try {
     // In production, you might want to fetch this from your API

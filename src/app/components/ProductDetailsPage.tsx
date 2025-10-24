@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import toast from 'react-hot-toast';
 import { useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
+import { PLACEHOLDER_IMAGE, getImageUrl } from '@/constants';
 
 interface ColorOption {
   name: string;
@@ -27,15 +28,14 @@ interface Product {
   price: number;
   originalPrice?: number;
   description: string;
-  category: string;
-  brand: string;
-  rating: number;
-  reviewCount: number;
+  category: { _id: string; name: string; slug: string };
+  brand?: string;
+  rating: { average: number; count: number };
   images: string[];
   colors: (string | ColorOption)[];
   sizes: (string | SizeOption)[];
-  inStock: boolean;
-  stockCount: number;
+  stock: { color?: string; size?: string; quantity: number }[];
+  tags?: string[];
   features: string[];
   specifications: Record<string, string>;
 }
@@ -57,7 +57,7 @@ interface ProductDetailsPageProps {
 export default function ProductDetailsPage({ productId }: ProductDetailsPageProps) {
   const router = useRouter();
   const { addToCart } = useCart();
-  const backendUrl = 'https://aphrodite-admin.onrender.com';
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -70,17 +70,11 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState("description");
 
-  useEffect(() => {
-    fetchProductDetails();
-    fetchProductReviews();
-    fetchRelatedProducts();
-  }, [productId]);
-
-  const fetchProductDetails = async () => {
+  const fetchProductDetails = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('🔄 Fetching product details for ID:', productId, 'from:', `${backendUrl}/api/products/${productId}`);
-      const response = await fetch(`${backendUrl}/api/products/${productId}`);
+      console.log('🔄 Fetching product details for ID:', productId);
+      const response = await fetch(`${backendUrl}/api/public/products/${productId}`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -92,16 +86,32 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const { product: data } = await response.json();
       console.log('✅ Product details data:', data);
+      console.log('📸 Product images:', data.images);
 
-      // Ensure images array has at least one valid image
-      if (!data.images || data.images.length === 0 || !data.images[0]) {
+      // Ensure required arrays exist
+      const processedData = {
+        ...data,
+        images: data.images || [],
+        features: data.features || [],
+        colors: data.colors || [],
+        sizes: data.sizes || [],
+        specifications: data.specifications || {}
+      };
+
+      // Convert image objects to API URLs
+      processedData.images = processedData.images?.map(
+        img => `/api/images/products/${processedData.id}/${img._id}`
+      ) || [];
+
+      if (processedData.images.length === 0) {
         console.warn('⚠️ No images found for product, using placeholder');
-        data.images = ['/placeholder-product.svg'];
+        processedData.images = [PLACEHOLDER_IMAGE];
       }
 
-      setProduct(data);
+      console.log('🖼️ Processed image URLs:', processedData.images);
+      setProduct(processedData);
       const firstColor = data.colors?.[0];
       const firstSize = data.sizes?.[0];
       setSelectedColor(typeof firstColor === 'string' ? firstColor : firstColor?.name || "");
@@ -115,12 +125,11 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
     } finally {
       setLoading(false);
     }
-  };
+  }, [backendUrl, productId, router]);
 
-  const fetchProductReviews = async () => {
+  const fetchProductReviews = useCallback(async () => {
     try {
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
-  const response = await fetch(`${backendUrl}/api/products/${productId}/reviews`);
+      const response = await fetch(`${backendUrl}/api/public/products/${productId}/reviews`);
 
       if (!response.ok) {
         // Reviews are optional, just log the error
@@ -129,18 +138,17 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         return;
       }
 
-      const data = await response.json();
-      setReviews(data.reviews || data || []);
+      const { reviews: data } = await response.json();
+      setReviews(data || []);
     } catch (err) {
       console.warn('Error fetching reviews:', err);
       setReviews([]);
     }
-  };
+  }, [backendUrl, productId]);
 
-  const fetchRelatedProducts = async () => {
+  const fetchRelatedProducts = useCallback(async () => {
     try {
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
-  const response = await fetch(`${backendUrl}/api/products/${productId}/related`);
+      const response = await fetch(`${backendUrl}/api/public/products/${productId}/related`);
 
       if (!response.ok) {
         console.warn('No related products available');
@@ -148,13 +156,26 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         return;
       }
 
-      const data = await response.json();
-      setRelatedProducts(data.products || data || []);
+      const { products } = await response.json();
+      setRelatedProducts(products || []);
     } catch (err) {
       console.warn('Error fetching related products:', err);
       setRelatedProducts([]);
     }
-  };
+  }, [backendUrl, productId]);
+  
+  // Calculate stock count from stock array
+  const stockCount = product?.stock?.reduce((total, item) => total + item.quantity, 0) || 0;
+  
+  // Check if product is in stock
+  const isInStock = stockCount > 0;
+
+  // Fetch data when component mounts or product ID changes
+  useEffect(() => {
+    fetchProductDetails();
+    fetchProductReviews();
+    fetchRelatedProducts();
+  }, [productId, fetchProductDetails, fetchProductReviews, fetchRelatedProducts]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -164,10 +185,10 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         productId: String(product.id),
         name: product.name,
         price: product.price,
-        image: product.images[0] || '/placeholder-product.svg',
+        image: getImageUrl(product.images[0]) || PLACEHOLDER_IMAGE,
         color: selectedColor,
         size: selectedSize,
-        stock: product.stockCount,
+        stock: stockCount,
         quantity,
       });
     } catch (err) {
@@ -184,10 +205,10 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         productId: String(product.id),
         name: product.name,
         price: product.price,
-        image: product.images[0] || '/placeholder-product.svg',
+        image: getImageUrl(product.images[0]) || PLACEHOLDER_IMAGE,
         color: selectedColor,
         size: selectedSize,
-        stock: product.stockCount,
+        stock: stockCount,
         quantity,
       });
 
@@ -282,7 +303,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
           <div className="breadcrumb">
             <Link href="/">Home</Link>
             <i className="bx bx-chevron-right"></i>
-            <Link href="/shop">{product.category}</Link>
+            <Link href="/shop">{product.category.name}</Link>
             <i className="bx bx-chevron-right"></i>
             <span>{product.name}</span>
           </div>
@@ -294,13 +315,17 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
             <div className="product-gallery">
               <div className="main-image">
                 <Image
-                  src={product.images?.[selectedImage] || 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&h=600&fit=crop'}
+                  src={getImageUrl(product.images?.[selectedImage]) || PLACEHOLDER_IMAGE}
                   alt={product.name}
                   width={500}
                   height={500}
+                  style={{ objectFit: 'contain', width: '100%', height: 'auto' }}
+                  priority
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&h=600&fit=crop';
+                    if (target.src !== PLACEHOLDER_IMAGE) {
+                      target.src = PLACEHOLDER_IMAGE;
+                    }
                   }}
                 />
                 <button
@@ -318,13 +343,16 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                     onClick={() => setSelectedImage(index)}
                   >
                     <Image
-                      src={image || 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=200&h=200&fit=crop'}
+                      src={getImageUrl(image) || PLACEHOLDER_IMAGE}
                       alt={`${product.name} ${index + 1}`}
                       width={100}
                       height={100}
+                      style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=200&h=200&fit=crop';
+                        if (target.src !== PLACEHOLDER_IMAGE) {
+                          target.src = PLACEHOLDER_IMAGE;
+                        }
                       }}
                     />
                   </button>
@@ -341,10 +369,10 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
 
               <div className="product-rating">
                 <div className="stars">
-                  {renderStars(Math.floor(product.rating))}
-                  <span className="rating-text">({product.rating})</span>
+                  {renderStars(Math.floor(product.rating.average))}
+                  <span className="rating-text">({product.rating.average})</span>
                 </div>
-                <span className="review-count">{product.reviewCount} reviews</span>
+                <span className="review-count">{product.rating.count} reviews</span>
               </div>
 
               <div className="product-price">
@@ -422,14 +450,14 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                   </button>
                   <span>{quantity}</span>
                   <button
-                    onClick={() => setQuantity(Math.min(product.stockCount, quantity + 1))}
-                    disabled={quantity >= product.stockCount}
+                    onClick={() => setQuantity(Math.min(stockCount, quantity + 1))}
+                    disabled={quantity >= stockCount}
                   >
                     <i className="bx bx-plus"></i>
                   </button>
                 </div>
                 <span className="stock-info">
-                  {product.stockCount > 5 ? 'In Stock' : `Only ${product.stockCount} left`}
+                  {stockCount > 5 ? 'In Stock' : `Only ${stockCount} left`}
                 </span>
               </div>
 
@@ -438,7 +466,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                 <button
                   className="add-to-cart-btn"
                   onClick={handleAddToCart}
-                  disabled={!product.inStock}
+                  disabled={!isInStock}
                 >
                   <i className="bx bx-shopping-bag"></i>
                   Add to Cart
@@ -446,7 +474,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                 <button
                   className="buy-now-btn"
                   onClick={handleBuyNow}
-                  disabled={!product.inStock}
+                  disabled={!isInStock}
                 >
                   Buy Now
                 </button>
@@ -531,11 +559,11 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                     <h3>Customer Reviews</h3>
                     <div className="rating-summary">
                       <div className="average-rating">
-                        <span className="rating-number">{product.rating}</span>
+                        <span className="rating-number">{product.rating.average}</span>
                         <div className="stars">
-                          {renderStars(Math.floor(product.rating))}
+                          {renderStars(Math.floor(product.rating.average))}
                         </div>
-                        <span>Based on {product.reviewCount} reviews</span>
+                        <span>Based on {product.rating.count} reviews</span>
                       </div>
                     </div>
                   </div>
@@ -575,27 +603,26 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
               <h2>You May Also Like</h2>
               <div className="related-products-grid">
                 {relatedProducts.map((relatedProduct) => {
-                  const imageUrl = relatedProduct.images?.[0] || '/placeholder-product.svg';
                   return (
                     <div key={relatedProduct.id} className="related-product-item">
                       <div className="product-image">
                         <Image
-                          src={imageUrl?.startsWith('http') ? imageUrl : `${backendUrl}${imageUrl}`}
+                          src={getImageUrl(relatedProduct.images?.[0]) || PLACEHOLDER_IMAGE}
                           alt={relatedProduct.name}
                           width={200}
                           height={200}
-                          style={{ objectFit: 'cover' }}
+                          style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
                           onError={(e) => {
-                            console.error('❌ Failed to load related product image:', imageUrl);
-                            e.currentTarget.src = '/placeholder-product.svg';
+                            const target = e.target as HTMLImageElement;
+                            target.src = PLACEHOLDER_IMAGE;
                           }}
                         />
                       </div>
                       <div className="product-info">
                         <h3>{relatedProduct.name}</h3>
                         <div className="rating">
-                          {renderStars(relatedProduct.rating)}
-                          <span>({relatedProduct.reviewCount || 0})</span>
+                          {renderStars(relatedProduct.rating.average)}
+                          <span>({relatedProduct.rating.count || 0})</span>
                         </div>
                         <div className="price">${relatedProduct.price}</div>
                         <button className="quick-add-btn">

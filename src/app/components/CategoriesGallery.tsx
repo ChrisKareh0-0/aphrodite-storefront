@@ -121,8 +121,8 @@ export default function CategoriesGallery() {
       const processedCategories = await Promise.all(
         categoriesData.categories.map(async (cat: BackendCategory, index: number) => {
             try {
-              console.log(`🔄 Fetching products for category "${cat.name}" from:`, `${BACKEND_URL}/api/products?category=${cat.slug}&limit=3`);
-              const productsResponse = await fetch(`${BACKEND_URL}/api/products?category=${cat.slug}&limit=3`, {
+              console.log(`🔄 Fetching products for category "${cat.name}" from:`, `${BACKEND_URL}/api/products?category=${cat._id}&limit=3`);
+              const productsResponse = await fetch(`${BACKEND_URL}/api/products?category=${cat._id}&limit=3`, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
@@ -226,8 +226,8 @@ export default function CategoriesGallery() {
     router.push(`/product/${productSlug}`);
   };
 
-  const handleViewAllClick = (category: string) => {
-    router.push(`/products?category=${category}`);
+  const handleViewAllClick = (categoryName: string) => {
+    router.push(`/products?category=${encodeURIComponent(categoryName)}`);
   };
 
   useEffect(() => {
@@ -329,7 +329,7 @@ export default function CategoriesGallery() {
                       <div className="categories-gallery__hero-content">
                         <h2>{category.title}</h2>
                         <p>{category.description}</p>
-                        <button className="categories-gallery__cta" onClick={() => handleViewAllClick(category.category)}>
+                        <button className="categories-gallery__cta" onClick={() => handleViewAllClick(category.title)}>
                           Shop Collection
                           <i className="bx bx-right-arrow-alt"></i>
                         </button>
@@ -346,13 +346,13 @@ export default function CategoriesGallery() {
                       <div key={pidx} className="categories-gallery__product">
                         <div className="categories-gallery__product-image" onClick={() => handleProductClick(product.slug || String(product.id))}>
                           <Image
-                            src={product.images?.[0] || 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop'}
+                            src={product.images?.[0] || PLACEHOLDER_IMAGE}
                             alt={product.name}
                             width={200}
                             height={200}
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
-                              target.src = 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop';
+                              target.src = PLACEHOLDER_IMAGE;
                             }}
                           />
                           <div className="categories-gallery__product-overlay">
