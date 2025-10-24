@@ -77,13 +77,7 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
     try {
       setAddingId(product.id);
 
-      const imageUrl = product.images && product.images.length > 0
-        ? (typeof product.images[0] === 'string'
-          ? product.images[0]
-          : product.images[0]?.url
-            ? product.images[0].url
-            : PLACEHOLDER_IMAGE)
-        : PLACEHOLDER_IMAGE;
+      const imageUrl = product.images?.[0] || PLACEHOLDER_IMAGE;
 
       addToCart({
         productId: String(product.id),
@@ -132,29 +126,19 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
           >
             {isNewCollection && <span className="new-badge">NEW</span>}
             <div className="product-image-wrapper" onClick={() => handleProductClick(product.slug || String(product.id))}>
-              {product.images?.[0] ? (
-                <Image
-                  src={product.images[0]}
-                  alt={product.name}
-                  width={250}
-                  height={200}
-                  onError={(e) => {
-                    console.error(`Failed to load image for product ${product.name}:`, product.images?.[0]);
-                    const imgElement = e.target as HTMLImageElement;
-                    imgElement.src = PLACEHOLDER_IMAGE;
-                  }}
-                  unoptimized={process.env.NODE_ENV === 'development'}
-                  priority={index < 4} // Load first 4 images with priority
-                />
-              ) : (
-                <Image
-                  src={PLACEHOLDER_IMAGE}
-                  alt={`${product.name} placeholder`}
-                  width={250}
-                  height={200}
-                  unoptimized={process.env.NODE_ENV === 'development'}
-                />
-              )}
+              <Image
+                src={product.images?.[0] || PLACEHOLDER_IMAGE}
+                alt={product.name}
+                width={250}
+                height={200}
+                onError={(e) => {
+                  console.error(`Failed to load image for product ${product.name}:`, product.images?.[0]);
+                  const imgElement = e.target as HTMLImageElement;
+                  imgElement.src = PLACEHOLDER_IMAGE;
+                }}
+                unoptimized={process.env.NODE_ENV === 'development'}
+                priority={index < 4} // Load first 4 images with priority
+              />
               <div className="product-overlay">
                 <button className="overlay-btn" aria-label="Quick view">
                   <i className="bx bx-show"></i>

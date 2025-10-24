@@ -48,17 +48,19 @@ export async function GET(request: NextRequest) {
       // Get image URL - handle both array of objects and array of strings
       let imageUrls: string[] = [];
       if (product.images && Array.isArray(product.images)) {
-        imageUrls = product.images.map((img: unknown) => {
-          if (typeof img === 'string') {
-            return img.startsWith('http') ? img : `${BACKEND_URL}${img.startsWith('/') ? '' : '/'}${img}`;
-          } else if (typeof img === 'object' && img !== null) {
-            const url = (img as Record<string, unknown>)?.url as string;
-            if (url) {
-              return url.startsWith('http') ? url : `${BACKEND_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+        imageUrls = product.images
+          .map((img: unknown): string | undefined => {
+            if (typeof img === 'string') {
+              return img.startsWith('http') ? img : `${BACKEND_URL}${img.startsWith('/') ? '' : '/'}${img}`;
+            } else if (typeof img === 'object' && img !== null) {
+              const url = (img as Record<string, unknown>)?.url as string;
+              if (url) {
+                return url.startsWith('http') ? url : `${BACKEND_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+              }
             }
-          }
-          return null;
-        }).filter(Boolean);
+            return undefined;
+          })
+          .filter((url): url is string => typeof url === 'string');
       }
 
       // Fallback to single image if available
