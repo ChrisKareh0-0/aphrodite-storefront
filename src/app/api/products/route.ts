@@ -61,6 +61,10 @@ export async function GET(request: NextRequest) {
         imageUrls = ['/images/placeholder.svg'];
       }
 
+      // Calculate total stock from stock array
+      const stockArray = Array.isArray(product.stock) ? product.stock : [];
+      const totalStock = stockArray.reduce((sum: number, item: { quantity?: number }) => sum + (item.quantity || 0), 0);
+
       return {
         id: product.id || product._id,
         slug: product.slug,
@@ -76,8 +80,8 @@ export async function GET(request: NextRequest) {
         images: imageUrls,
         colors: (product.colors as string[]) || [],
         sizes: (product.sizes as string[]) || [],
-        inStock: ((product.stock as number) || 0) > 0,
-        stockCount: (product.stock as number) || 0,
+        inStock: totalStock > 0,
+        stockCount: totalStock,
         tags: (product.tags as string[]) || [],
         featured: (product.isFeatured as boolean) || false,
         isOnSale: (product.isOnSale as boolean) || false,
@@ -85,8 +89,8 @@ export async function GET(request: NextRequest) {
         discount: product.originalPrice
           ? Math.round((((product.originalPrice as number) - (product.price as number)) / (product.originalPrice as number)) * 100)
           : 0,
-        availability: ((product.stock as number) || 0) > 0
-          ? (((product.stock as number) || 0) > 5 ? 'In Stock' : 'Limited Stock')
+        availability: totalStock > 0
+          ? (totalStock > 5 ? 'In Stock' : 'Limited Stock')
           : 'Out of Stock'
       };
     });

@@ -71,8 +71,8 @@ export default function CategoriesGallery() {
 
   const fetchCollectionSettings = async () => {
     try {
-      console.log('🔄 Fetching collection settings from:', `${BACKEND_URL}/api/collection`);
-      const data = await fetchWithConfig('/api/collection');
+      console.log('🔄 Fetching collection settings from:', `${BACKEND_URL}/api/settings/collection`);
+      const data = await fetchWithConfig('/api/settings/collection');
       console.log('✅ Collection settings data:', data);
       setCollectionSettings(data);
     } catch (error) {
@@ -86,8 +86,8 @@ export default function CategoriesGallery() {
       setLoading(true);
 
       // Fetch categories from backend
-      console.log('🔄 Fetching categories from:', `${BACKEND_URL}/api/categories`);
-      const categoriesResponse = await fetch(`${BACKEND_URL}/api/categories`, {
+      console.log('🔄 Fetching categories from:', `${BACKEND_URL}/api/public/categories`);
+      const categoriesResponse = await fetch(`${BACKEND_URL}/api/public/categories`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -121,8 +121,8 @@ export default function CategoriesGallery() {
       const processedCategories = await Promise.all(
         categoriesData.categories.map(async (cat: BackendCategory, index: number) => {
             try {
-              console.log(`🔄 Fetching products for category "${cat.name}" from:`, `${BACKEND_URL}/api/products?category=${cat._id}&limit=3`);
-              const productsResponse = await fetch(`${BACKEND_URL}/api/products?category=${cat._id}&limit=3`, {
+              console.log(`🔄 Fetching products for category "${cat.name}" from:`, `${BACKEND_URL}/api/public/products?category=${cat.slug}&limit=3`);
+              const productsResponse = await fetch(`${BACKEND_URL}/api/public/products?category=${cat.slug}&limit=3`, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
@@ -346,13 +346,13 @@ export default function CategoriesGallery() {
                       <div key={pidx} className="categories-gallery__product">
                         <div className="categories-gallery__product-image" onClick={() => handleProductClick(product.slug || String(product.id))}>
                           <Image
-                            src={product.images?.[0] || PLACEHOLDER_IMAGE}
+                            src={product.images?.[0] || '/placeholder-product.svg'}
                             alt={product.name}
                             width={200}
                             height={200}
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
-                              target.src = PLACEHOLDER_IMAGE;
+                              target.src = '/placeholder-product.svg';
                             }}
                           />
                           <div className="categories-gallery__product-overlay">
