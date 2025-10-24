@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { PLACEHOLDER_IMAGE } from "@/constants";
 import InteractiveDots from "./InteractiveDots";
 import CategoriesGallery from "./CategoriesGallery";
 import CenterNavbar from "./CenterNavbar";
+import { getImageUrl } from "@/constants";
 import "../carousel.css";
 import "../categories-gallery.css";
 import "../center-navbar.css";
@@ -24,7 +26,7 @@ interface HeroData {
 
 export default function Landing() {
   const [heroData, setHeroData] = useState<HeroData>({
-    imageUrl: 'https://i.postimg.cc/t403yfn9/home2.jpg',
+    imageUrl: PLACEHOLDER_IMAGE,
     title: 'SUMMER COLLECTION',
     heading: 'FALL - WINTER\nCollection 2025',
     description: 'A specialist label creating luxury essentials. Ethically crafted with an unwavering commitment to exceptional quality.',
@@ -33,16 +35,17 @@ export default function Landing() {
   });
   const [, setLoading] = useState(true);
 
-  const backendUrl = 'https://aphrodite-admin.onrender.com';
-
   useEffect(() => {
     (async () => {
       try {
-        console.log('🔄 Fetching hero data from:', `${backendUrl}/api/hero`);
-        const response = await fetch(`${backendUrl}/api/hero`);
+        console.log('🔄 Fetching hero data from:', `/api/hero`);
+        const response = await fetch(`/api/hero`);
         const data = await response.json();
         console.log('✅ Hero data:', data);
-        setHeroData(data);
+        setHeroData({
+          ...data,
+          imageUrl: getImageUrl(data.imageUrl) || data.imageUrl
+        });
       } catch (error) {
         console.error('Error fetching hero data:', error);
         // Keep default values on error
@@ -64,7 +67,6 @@ export default function Landing() {
     const anchors = Array.from(document.querySelectorAll<HTMLAnchorElement>(".center-navbar__nav-item, a[href^='#']"));
     anchors.forEach((a) => a.addEventListener("click", handleClick));
     return () => anchors.forEach((a) => a.removeEventListener("click", handleClick));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
