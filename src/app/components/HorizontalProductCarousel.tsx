@@ -11,7 +11,7 @@ interface Product {
   slug?: string;
   name: string;
   price: number;
-  images: Array<{url: string}> | string[];
+  images: string[];
   rating: number;
   description?: string;
   category?: string;
@@ -132,17 +132,29 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
           >
             {isNewCollection && <span className="new-badge">NEW</span>}
             <div className="product-image-wrapper" onClick={() => handleProductClick(product.slug || String(product.id))}>
-              <Image
-                src={product.images?.[0] || PLACEHOLDER_IMAGE}
-                alt={product.name}
-                width={250}
-                height={200}
-                onError={(e) => {
-                  console.error(`Failed to load image for product ${product.name}:`, product.images?.[0]);
-                  const imgElement = e.target as HTMLImageElement;
-                  imgElement.src = PLACEHOLDER_IMAGE;
-                }}
-              />
+              {product.images?.[0] ? (
+                <Image
+                  src={product.images[0]}
+                  alt={product.name}
+                  width={250}
+                  height={200}
+                  onError={(e) => {
+                    console.error(`Failed to load image for product ${product.name}:`, product.images?.[0]);
+                    const imgElement = e.target as HTMLImageElement;
+                    imgElement.src = PLACEHOLDER_IMAGE;
+                  }}
+                  unoptimized={process.env.NODE_ENV === 'development'}
+                  priority={index < 4} // Load first 4 images with priority
+                />
+              ) : (
+                <Image
+                  src={PLACEHOLDER_IMAGE}
+                  alt={`${product.name} placeholder`}
+                  width={250}
+                  height={200}
+                  unoptimized={process.env.NODE_ENV === 'development'}
+                />
+              )}
               <div className="product-overlay">
                 <button className="overlay-btn" aria-label="Quick view">
                   <i className="bx bx-show"></i>

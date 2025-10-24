@@ -34,7 +34,7 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'aphrodite-admin.onrender.com',
         port: '',
-        pathname: '/uploads/**',
+        pathname: '/**',
       },
     ],
     unoptimized: process.env.NODE_ENV === 'development',
