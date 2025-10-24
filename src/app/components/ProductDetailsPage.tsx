@@ -102,7 +102,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
 
       // Convert image objects to API URLs
       processedData.images = processedData.images?.map(
-        img => `/api/images/products/${processedData.id}/${img._id}`
+        (img: { _id: string }) => `/api/images/products/${processedData.id}/${img._id}`
       ) || [];
 
       if (processedData.images.length === 0) {
