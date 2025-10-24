@@ -57,7 +57,6 @@ interface ProductDetailsPageProps {
 export default function ProductDetailsPage({ productId }: ProductDetailsPageProps) {
   const router = useRouter();
   const { addToCart } = useCart();
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -74,7 +73,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
     try {
       setLoading(true);
       console.log('🔄 Fetching product details for ID:', productId);
-      const response = await fetch(`${backendUrl}/api/public/products/${productId}`);
+      const response = await fetch(`/api/products/${productId}`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -129,7 +128,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
 
   const fetchProductReviews = useCallback(async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/public/products/${productId}/reviews`);
+      const response = await fetch(`/api/products/${productId}/reviews`);
 
       if (!response.ok) {
         // Reviews are optional, just log the error
@@ -144,11 +143,11 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
       console.warn('Error fetching reviews:', err);
       setReviews([]);
     }
-  }, [backendUrl, productId]);
+  }, [productId]);
 
   const fetchRelatedProducts = useCallback(async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/public/products/${productId}/related`);
+      const response = await fetch(`/api/products/${productId}/related`);
 
       if (!response.ok) {
         console.warn('No related products available');
@@ -162,7 +161,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
       console.warn('Error fetching related products:', err);
       setRelatedProducts([]);
     }
-  }, [backendUrl, productId]);
+  }, [productId]);
   
   // Calculate stock count from stock array
   const stockCount = product?.stock?.reduce((total, item) => total + item.quantity, 0) || 0;
@@ -222,8 +221,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
 
   const toggleWishlist = async () => {
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
-      const response = await fetch(`${backendUrl}/api/wishlist/toggle`, {
+      const response = await fetch(`/api/wishlist/toggle`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
