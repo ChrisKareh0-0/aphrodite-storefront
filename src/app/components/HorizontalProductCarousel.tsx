@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "../context/CartContext";
-import { getImageUrl, PLACEHOLDER_IMAGE } from "@/constants";
+import { PLACEHOLDER_IMAGE } from "@/constants";
 
 interface Product {
   id: number | string;
@@ -62,9 +62,9 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
 
       const imageUrl = product.images && product.images.length > 0
         ? (typeof product.images[0] === 'string'
-          ? getImageUrl(product.images[0])
+          ? product.images[0]
           : product.images[0]?.url
-            ? getImageUrl(product.images[0].url)
+            ? product.images[0].url
             : PLACEHOLDER_IMAGE)
         : PLACEHOLDER_IMAGE;
 
@@ -117,9 +117,9 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
             <div className="product-image-wrapper" onClick={() => handleProductClick(product.slug || String(product.id))}>
               <Image
                 src={typeof product.images?.[0] === 'string' 
-                  ? getImageUrl(product.images[0])
+                  ? product.images[0]
                   : product.images?.[0]?.url 
-                    ? getImageUrl(product.images[0].url) 
+                    ? product.images[0].url 
                     : PLACEHOLDER_IMAGE}
                 alt={product.name}
                 width={250}
