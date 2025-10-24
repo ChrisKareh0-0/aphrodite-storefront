@@ -6,10 +6,11 @@ export async function GET(
   context: { params: { slug: string } }
 ) {
   const { slug } = context.params;
+
   try {
-    console.log('🔄 Fetching related products for:', slug);
+    console.log('🔄 Fetching reviews for product:', slug);
     const response = await fetch(
-      `${BACKEND_URL}/api/public/products/${slug}/related`,
+      `${BACKEND_URL}/api/public/products/${slug}/reviews`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -19,17 +20,23 @@ export async function GET(
     );
 
     if (!response.ok) {
+      if (response.status === 404) {
+        return NextResponse.json(
+          { error: 'Reviews not found' },
+          { status: 404 }
+        );
+      }
       throw new Error(`Backend returned ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('✅ Related products data:', data);
+    console.log('✅ Reviews data:', data);
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Error fetching related products:', error);
+    console.error('Error fetching reviews:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch related products', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to fetch reviews', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
