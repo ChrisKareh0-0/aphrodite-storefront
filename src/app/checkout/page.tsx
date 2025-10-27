@@ -185,7 +185,7 @@ export default function Checkout() {
                     value={formData.phone}
                     onChange={handleChange}
                     required
-                    placeholder="+1 (555) 000-0000"
+                    placeholder="+961 81 937 847"
                   />
                 </div>
               </div>

@@ -613,14 +613,14 @@ export default function Landing() {
               <i className="bx bx-phone"></i>
               <div>
                 <span className="contact-label">Phone</span>
-                <a href="tel:+1234567890" className="contact-value">+1 (234) 567-890</a>
+                <a href="tel:+1234567890" className="contact-value">+961 81 937 847</a>
               </div>
             </div>
             <div className="contact-item">
               <i className="bx bx-envelope"></i>
               <div>
                 <span className="contact-label">Email</span>
-                <a href="mailto:info@aphrodite.com" className="contact-value">info@aphrodite.com</a>
+                <a href="mailto:aphroditeee.lb@gmail.com" className="contact-value">aphroditeee.lb@gmail.com</a>
               </div>
             </div>
           </div>
@@ -629,20 +629,23 @@ export default function Landing() {
           <div className="footer-social-section">
             <h3>Follow Us</h3>
             <div className="social-links">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+              {/* <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                 <i className="bx bxl-facebook"></i>
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              </a> */}
+              <a href="https://www.instagram.com/aphroditeee.lb?igsh=Y3gycGZ2NGp0czhh" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 <i className="bx bxl-instagram"></i>
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+              {/* <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
                 <i className="bx bxl-twitter"></i>
-              </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              </a> */}
+              {/* <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                 <i className="bx bxl-linkedin"></i>
-              </a>
-              <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer" aria-label="Pinterest">
+              </a> */}
+              {/* <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer" aria-label="Pinterest">
                 <i className="bx bxl-pinterest"></i>
+              </a> */}
+              <a href="https://wa.me/96181937847" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <i className="bx bxl-whatsapp"></i>
               </a>
             </div>
           </div>

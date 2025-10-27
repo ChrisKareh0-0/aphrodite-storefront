@@ -193,9 +193,9 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
                   {addingId === product.id ? 'Adding…' : justAddedId === product.id ? 'Added!' : 'Add to Cart'}
                 </button>
               </div>
-              <div className="rating">
+              {/* <div className="rating">
                 {renderStars(Math.floor(product.rating || 0))}
-              </div>
+              </div> */}
             </div>
           </div>
         ))}

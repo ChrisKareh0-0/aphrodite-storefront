@@ -591,6 +591,6 @@
   }
 
   .categories-gallery__indicators {
-    margin-top: 1.5rem; /* Reduced from 3rem for mobile */
+    margin-top: 4rem; /* Reduced from 3rem for mobile */
   }
 }

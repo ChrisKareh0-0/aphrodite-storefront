@@ -634,10 +634,10 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                       </div>
                       <div className="product-info">
                         <h3>{relatedProduct.name}</h3>
-                        <div className="rating">
+                        {/* <div className="rating">
                           {renderStars(relatedProduct.rating.average)}
                           <span>({relatedProduct.rating.count || 0})</span>
-                        </div>
+                        </div> */}
                         <div className="price">${relatedProduct.price}</div>
                         <button className="quick-add-btn">
                           <i className="bx bx-plus"></i>

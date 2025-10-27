@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Oswald, Merriweather } from "next/font/google";
 import "./globals.css";
 import "./landing.css";
 import GlobalLoadingOverlay from "./components/GlobalLoadingOverlay";
+import WhatsAppButton from "./components/WhatsAppButton";
 import { Toaster } from 'react-hot-toast';
 import { CartProvider } from './context/CartContext';
 
@@ -76,6 +77,7 @@ export default function RootLayout({
         <CartProvider>
           {children}
         </CartProvider>
+        <WhatsAppButton />
       </body>
     </html>
   );

@@ -121,8 +121,8 @@ export default function CategoriesGallery() {
       const processedCategories = await Promise.all(
         categoriesData.categories.map(async (cat: BackendCategory, index: number) => {
             try {
-              console.log(`🔄 Fetching products for category "${cat.name}" from:`, `${BACKEND_URL}/api/public/products?category=${cat.slug}&limit=6`);
-              const productsResponse = await fetch(`${BACKEND_URL}/api/public/products?category=${cat.slug}&limit=6`, {
+              console.log(`🔄 Fetching products for category "${cat.name}" from:`, `${BACKEND_URL}/api/public/products?category=${cat.slug}&limit=4`);
+              const productsResponse = await fetch(`${BACKEND_URL}/api/public/products?category=${cat.slug}&limit=4`, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
@@ -147,6 +147,7 @@ export default function CategoriesGallery() {
               : "https://i.postimg.cc/Xqmwr12c/clothing.webp";
 
             // Map the products data, ensuring proper image URL handling
+            // Limit to 4 products maximum
             const mappedProducts = (productsData.products || []).map((prod: BackendProduct) => ({
               ...prod,
               images: (prod.images || []).map((img: string | { url: string }) => 
@@ -154,7 +155,7 @@ export default function CategoriesGallery() {
                   ? (img.startsWith('http') ? img : `${BACKEND_URL}${img}`)
                   : (img.url ? (img.url.startsWith('http') ? img.url : `${BACKEND_URL}${img.url}`) : '')
               ).filter(Boolean)
-            }));
+            })).slice(0, 4);
 
             // Ensure each product has at least one image
             mappedProducts.forEach((prod: BackendProduct) => {
@@ -342,7 +343,7 @@ export default function CategoriesGallery() {
                 <div className="categories-gallery__products">
                   <h3>Featured Products</h3>
                   <div className="categories-gallery__products-grid">
-                    {category.products.map((product, pidx) => (
+                    {category.products.slice(0, 4).map((product, pidx) => (
                       <div key={pidx} className="categories-gallery__product">
                         <div className="categories-gallery__product-image-wrapper" onClick={() => handleProductClick(product.slug || String(product.id))}>
                           <div className="categories-gallery__product-image">
