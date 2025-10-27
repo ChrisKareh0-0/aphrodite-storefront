@@ -57,7 +57,7 @@ export async function GET(
 
     // Calculate stock count from stock array
     const stockArray = Array.isArray(product.stock) ? product.stock : [];
-    const totalStock = stockArray.reduce((sum, item) => sum + (item.quantity || 0), 0);
+    const totalStock = stockArray.reduce((sum: number, item: { quantity?: number }) => sum + (item.quantity || 0), 0);
 
     const transformedProduct = {
       id: product.id,

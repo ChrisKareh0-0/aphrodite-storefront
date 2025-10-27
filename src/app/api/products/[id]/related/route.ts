@@ -100,7 +100,7 @@ export async function GET(
         
         // Calculate stock from stock array
         const stockArray = Array.isArray(p.stock) ? p.stock : [];
-        const totalStock = stockArray.reduce((sum, item: Record<string, unknown>) => sum + ((item.quantity as number) || 0), 0);
+        const totalStock = stockArray.reduce((sum: number, item: Record<string, unknown>) => sum + ((item.quantity as number) || 0), 0);
 
         return {
           id: p.id,
