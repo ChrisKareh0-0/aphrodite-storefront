@@ -42,18 +42,22 @@ export async function GET(
     }
 
     // Transform backend data to match frontend expectations
-    // Process images with fallback
-    let images = product.images?.map((img: unknown) => {
-      const imgUrl = typeof img === 'string' ? img : (img as Record<string, unknown>)?.url as string;
+    // Process images - backend already returns URLs
+    let images = product.images?.map((imgUrl: string) => {
       if (!imgUrl) return null;
-  const resolved = (imgUrl as string).startsWith('http') ? imgUrl : `${BACKEND_URL}${imgUrl}`;
-  return resolved;
+      // Convert relative URLs to absolute URLs
+      const resolved = imgUrl.startsWith('http') ? imgUrl : `${BACKEND_URL}${imgUrl.startsWith('/') ? imgUrl : '/' + imgUrl}`;
+      return resolved;
     }).filter(Boolean) || [];
 
     // Ensure at least one valid image
     if (images.length === 0) {
-      images = ['/placeholder-product.svg'];
+      images = [`${BACKEND_URL}/images/placeholder.svg`];
     }
+
+    // Calculate stock count from stock array
+    const stockArray = Array.isArray(product.stock) ? product.stock : [];
+    const totalStock = stockArray.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
     const transformedProduct = {
       id: product.id,
@@ -63,15 +67,19 @@ export async function GET(
       originalPrice: product.originalPrice,
       description: product.description,
       shortDescription: product.shortDescription,
-      category: product.category?.name || 'Uncategorized',
-  brand: 'Aphrodite', // Default brand if not in backend
-      rating: product.rating?.average || 0,
-      reviewCount: product.rating?.count || 0,
+      category: typeof product.category === 'object' && product.category
+        ? { _id: product.category._id, name: product.category.name, slug: product.category.slug }
+        : { _id: '', name: 'Uncategorized', slug: '' },
+      brand: 'Aphrodite', // Default brand if not in backend
+      rating: product.rating && typeof product.rating === 'object'
+        ? { average: product.rating.average || 0, count: product.rating.count || 0 }
+        : { average: 0, count: 0 },
       images,
       colors: product.colors || [],
       sizes: product.sizes || [],
-      inStock: product.stock > 0,
-      stockCount: product.stock,
+      stock: stockArray,
+      inStock: totalStock > 0,
+      stockCount: totalStock,
       features: [
         ...(product.tags || []),
         ...(product.description ? ['Premium quality'] : [])
@@ -82,12 +90,12 @@ export async function GET(
       updatedAt: product.updatedAt || product.createdAt,
       views: Math.floor(Math.random() * 1000) + 100,
       lastUpdated: product.updatedAt || product.createdAt,
-      availability: product.stock > 0
-        ? (product.stock > 5 ? 'In Stock' : 'Limited Stock')
+      availability: totalStock > 0
+        ? (totalStock > 5 ? 'In Stock' : 'Limited Stock')
         : 'Out of Stock'
     };
 
-    return NextResponse.json(transformedProduct);
+    return NextResponse.json({ product: transformedProduct });
 
   } catch (error) {
     console.error('Error fetching product from backend:', error);

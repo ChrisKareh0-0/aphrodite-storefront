@@ -79,35 +79,46 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         if (response.status === 404) {
           toast.error('Product not found');
           setError('Product not found');
-          router.push('/products');
           return;
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const { product: data } = await response.json();
+      if (!data) {
+        toast.error('Product not found');
+        setError('Product not found');
+        router.push('/products');
+        return;
+      }
       console.log('✅ Product details data:', data);
       console.log('📸 Product images:', data.images);
 
-      // Ensure required arrays exist
+      // Images should already be absolute URLs from the API
+      let processedImages = data.images || [];
+      
+      // Fallback to placeholder if no images
+      if (processedImages.length === 0) {
+        console.warn('⚠️ No images found for product, using placeholder');
+        processedImages = [PLACEHOLDER_IMAGE];
+      }
+      
+      // Ensure all images are valid URLs or fallback to placeholder
+      processedImages = processedImages.map((img: string) => {
+        if (!img || img === '/placeholder-product.svg') {
+          return PLACEHOLDER_IMAGE;
+        }
+        return img;
+      });
+
       const processedData = {
         ...data,
-        images: data.images || [],
+        images: processedImages,
         features: data.features || [],
         colors: data.colors || [],
         sizes: data.sizes || [],
         specifications: data.specifications || {}
       };
-
-      // Convert image objects to API URLs
-      processedData.images = processedData.images?.map(
-        (img: { _id: string }) => `/api/images/products/${processedData.id}/${img._id}`
-      ) || [];
-
-      if (processedData.images.length === 0) {
-        console.warn('⚠️ No images found for product, using placeholder');
-        processedData.images = [PLACEHOLDER_IMAGE];
-      }
 
       console.log('🖼️ Processed image URLs:', processedData.images);
       setProduct(processedData);
@@ -124,7 +135,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
     } finally {
       setLoading(false);
     }
-  }, [backendUrl, productId, router]);
+  }, [productId, router]);
 
   const fetchProductReviews = useCallback(async () => {
     try {
@@ -184,7 +195,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         productId: String(product.id),
         name: product.name,
         price: product.price,
-        image: getImageUrl(product.images[0]) || PLACEHOLDER_IMAGE,
+        image: product.images[0] || PLACEHOLDER_IMAGE,
         color: selectedColor,
         size: selectedSize,
         stock: stockCount,
@@ -204,7 +215,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         productId: String(product.id),
         name: product.name,
         price: product.price,
-        image: getImageUrl(product.images[0]) || PLACEHOLDER_IMAGE,
+        image: product.images[0] || PLACEHOLDER_IMAGE,
         color: selectedColor,
         size: selectedSize,
         stock: stockCount,
@@ -313,7 +324,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
             <div className="product-gallery">
               <div className="main-image">
                 <Image
-                  src={getImageUrl(product.images?.[selectedImage]) || PLACEHOLDER_IMAGE}
+                  src={product.images?.[selectedImage] || PLACEHOLDER_IMAGE}
                   alt={product.name}
                   width={500}
                   height={500}
@@ -325,6 +336,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                       target.src = PLACEHOLDER_IMAGE;
                     }
                   }}
+                  unoptimized
                 />
                 <button
                   className={`wishlist-btn ${isWishlisted ? 'active' : ''}`}
@@ -341,7 +353,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                     onClick={() => setSelectedImage(index)}
                   >
                     <Image
-                      src={getImageUrl(image) || PLACEHOLDER_IMAGE}
+                      src={image || PLACEHOLDER_IMAGE}
                       alt={`${product.name} ${index + 1}`}
                       width={100}
                       height={100}
@@ -352,6 +364,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                           target.src = PLACEHOLDER_IMAGE;
                         }
                       }}
+                      unoptimized
                     />
                   </button>
                 ))}
@@ -365,13 +378,13 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                 <div className="product-brand">{product.brand}</div>
               </div>
 
-              <div className="product-rating">
+              {/* <div className="product-rating">
                 <div className="stars">
                   {renderStars(Math.floor(product.rating.average))}
                   <span className="rating-text">({product.rating.average})</span>
                 </div>
                 <span className="review-count">{product.rating.count} reviews</span>
-              </div>
+              </div> */}
 
               <div className="product-price">
                 <span className="current-price">${product.price}</span>
@@ -605,15 +618,18 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                     <div key={relatedProduct.id} className="related-product-item">
                       <div className="product-image">
                         <Image
-                          src={getImageUrl(relatedProduct.images?.[0]) || PLACEHOLDER_IMAGE}
+                          src={relatedProduct.images?.[0] || PLACEHOLDER_IMAGE}
                           alt={relatedProduct.name}
                           width={200}
                           height={200}
                           style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = PLACEHOLDER_IMAGE;
+                            if (target.src !== PLACEHOLDER_IMAGE) {
+                              target.src = PLACEHOLDER_IMAGE;
+                            }
                           }}
+                          unoptimized
                         />
                       </div>
                       <div className="product-info">

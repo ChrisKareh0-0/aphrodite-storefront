@@ -92,12 +92,15 @@ export async function GET(
 
         // Ensure at least one valid image
         if (images.length === 0) {
-          images = ['/placeholder-product.svg'];
+          images = [`${BACKEND_URL}/images/placeholder.svg`];
         }
 
         const category = p.category as Record<string, unknown> | undefined;
         const rating = p.rating as Record<string, unknown> | undefined;
-        const stock = (p.stock as number) || 0;
+        
+        // Calculate stock from stock array
+        const stockArray = Array.isArray(p.stock) ? p.stock : [];
+        const totalStock = stockArray.reduce((sum, item: Record<string, unknown>) => sum + ((item.quantity as number) || 0), 0);
 
         return {
           id: p.id,
@@ -111,15 +114,15 @@ export async function GET(
           images,
           colors: p.colors || [],
           sizes: p.sizes || [],
-          inStock: stock > 0,
-          stockCount: stock,
+          inStock: totalStock > 0,
+          stockCount: totalStock,
           tags: p.tags || [],
           discount: p.originalPrice
             ? Math.round((((p.originalPrice as number) - (p.price as number)) / (p.originalPrice as number)) * 100)
             : 0,
           isPopular: ((rating?.count as number) || 0) > 50,
-          availability: stock > 0
-            ? (stock > 5 ? 'In Stock' : 'Limited Stock')
+          availability: totalStock > 0
+            ? (totalStock > 5 ? 'In Stock' : 'Limited Stock')
             : 'Out of Stock'
         };
       });

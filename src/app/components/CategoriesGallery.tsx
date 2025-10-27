@@ -121,8 +121,8 @@ export default function CategoriesGallery() {
       const processedCategories = await Promise.all(
         categoriesData.categories.map(async (cat: BackendCategory, index: number) => {
             try {
-              console.log(`🔄 Fetching products for category "${cat.name}" from:`, `${BACKEND_URL}/api/public/products?category=${cat.slug}&limit=3`);
-              const productsResponse = await fetch(`${BACKEND_URL}/api/public/products?category=${cat.slug}&limit=3`, {
+              console.log(`🔄 Fetching products for category "${cat.name}" from:`, `${BACKEND_URL}/api/public/products?category=${cat.slug}&limit=6`);
+              const productsResponse = await fetch(`${BACKEND_URL}/api/public/products?category=${cat.slug}&limit=6`, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
@@ -304,7 +304,7 @@ export default function CategoriesGallery() {
                 <span className="categories-gallery__nav-number">{String(index + 1).padStart(2, '0')}</span>
                 <div className="categories-gallery__nav-text">
                   <h3>{category.title}</h3>
-                  <p>{category.subtitle}</p>
+                  {/* <p>{category.subtitle}</p> */}
                 </div>
               </button>
             ))}
@@ -344,17 +344,21 @@ export default function CategoriesGallery() {
                   <div className="categories-gallery__products-grid">
                     {category.products.map((product, pidx) => (
                       <div key={pidx} className="categories-gallery__product">
-                        <div className="categories-gallery__product-image" onClick={() => handleProductClick(product.slug || String(product.id))}>
-                          <Image
-                            src={product.images?.[0] || '/placeholder-product.svg'}
-                            alt={product.name}
-                            width={200}
-                            height={200}
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = '/placeholder-product.svg';
-                            }}
-                          />
+                        <div className="categories-gallery__product-image-wrapper" onClick={() => handleProductClick(product.slug || String(product.id))}>
+                          <div className="categories-gallery__product-image">
+                            <Image
+                              src={product.images?.[0] || '/placeholder-product.svg'}
+                              alt={product.name}
+                              width={400}
+                              height={400}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = '/placeholder-product.svg';
+                              }}
+                              unoptimized
+                            />
+                          </div>
                           <div className="categories-gallery__product-overlay">
                             <button className="categories-gallery__product-btn">
                               <i className="bx bx-shopping-bag"></i>
