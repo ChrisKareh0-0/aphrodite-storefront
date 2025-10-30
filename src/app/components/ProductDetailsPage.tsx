@@ -106,7 +106,8 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
 
 
       // Convert image objects or strings to valid URLs
-      processedData.images = (processedData.images || []).map((img: any) => {
+      type ProductImage = string | { _id?: string; path?: string; alt?: string; isPrimary?: boolean };
+      processedData.images = (processedData.images || []).map((img: ProductImage) => {
         if (!img) return PLACEHOLDER_IMAGE;
         // If already a full URL (string)
         if (typeof img === 'string' && (img.startsWith('http') || img.startsWith('/uploads/') || img.startsWith('/api/'))) {
@@ -115,6 +116,10 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         // If object with _id property
         if (typeof img === 'object' && img._id) {
           return `/api/images/products/${processedData.id}/${img._id}`;
+        }
+        // If object with path property (filename)
+        if (typeof img === 'object' && img.path) {
+          return `/uploads/products/${img.path}`;
         }
         // If string (maybe just a filename)
         if (typeof img === 'string') {
