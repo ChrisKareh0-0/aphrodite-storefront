@@ -1,5 +1,8 @@
-// Backend API URL (always production)
-export const BACKEND_URL = 'https://aphrodite-admin.onrender.com';
+// Backend API URL (dynamic for dev/prod)
+export const BACKEND_URL =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3001'
+    : 'https://aphrodite-admin.onrender.com';
 
 // Type for MongoDB image object
 interface MongoImage {
@@ -12,11 +15,14 @@ interface MongoImage {
 
 // Image URL builder helper
 export const getImageUrl = (path?: string | MongoImage | null) => {
-  // Always use production URL for images
-  const baseUrl = 'https://aphrodite-admin.onrender.com';
+  // Use dynamic backend URL for images
+  const baseUrl =
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3001'
+      : 'https://aphrodite-admin.onrender.com';
 
   // Always use absolute URL for placeholder
-  const ABS_PLACEHOLDER = 'https://aphrodite-admin.onrender.com/images/placeholder.svg';
+  const ABS_PLACEHOLDER = `${baseUrl}/images/placeholder.svg`;
 
   // Handle undefined, null, or empty input
   if (!path) return ABS_PLACEHOLDER;
@@ -55,4 +61,4 @@ export const getImageUrl = (path?: string | MongoImage | null) => {
 };
 
 // Placeholder image when product image is not available
-export const PLACEHOLDER_IMAGE = 'https://aphrodite-admin.onrender.com/images/placeholder.svg';
+export const PLACEHOLDER_IMAGE = `${BACKEND_URL}/images/placeholder.svg`;

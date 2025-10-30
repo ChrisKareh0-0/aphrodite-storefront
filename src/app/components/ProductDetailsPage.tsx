@@ -94,31 +94,40 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
       console.log('✅ Product details data:', data);
       console.log('📸 Product images:', data.images);
 
-      // Images should already be absolute URLs from the API
-      let processedImages = data.images || [];
-      
-      // Fallback to placeholder if no images
-      if (processedImages.length === 0) {
-        console.warn('⚠️ No images found for product, using placeholder');
-        processedImages = [PLACEHOLDER_IMAGE];
-      }
-      
-      // Ensure all images are valid URLs or fallback to placeholder
-      processedImages = processedImages.map((img: string) => {
-        if (!img || img === '/placeholder-product.svg') {
-          return PLACEHOLDER_IMAGE;
-        }
-        return img;
-      });
-
+      // Ensure required arrays exist
       const processedData = {
         ...data,
-        images: processedImages,
+        images: data.images || [],
         features: data.features || [],
         colors: data.colors || [],
         sizes: data.sizes || [],
         specifications: data.specifications || {}
       };
+
+
+      // Convert image objects or strings to valid URLs
+      processedData.images = (processedData.images || []).map((img: any) => {
+        if (!img) return PLACEHOLDER_IMAGE;
+        // If already a full URL (string)
+        if (typeof img === 'string' && (img.startsWith('http') || img.startsWith('/uploads/') || img.startsWith('/api/'))) {
+          return img;
+        }
+        // If object with _id property
+        if (typeof img === 'object' && img._id) {
+          return `/api/images/products/${processedData.id}/${img._id}`;
+        }
+        // If string (maybe just a filename)
+        if (typeof img === 'string') {
+          return `/uploads/products/${img}`;
+        }
+        // Fallback
+        return PLACEHOLDER_IMAGE;
+      });
+
+      if (!processedData.images.length) {
+        console.warn('⚠️ No images found for product, using placeholder');
+        processedData.images = [PLACEHOLDER_IMAGE];
+      }
 
       console.log('🖼️ Processed image URLs:', processedData.images);
       setProduct(processedData);
@@ -195,7 +204,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         productId: String(product.id),
         name: product.name,
         price: product.price,
-        image: product.images[0] || PLACEHOLDER_IMAGE,
+        image: getImageUrl(product.images[0]) || PLACEHOLDER_IMAGE,
         color: selectedColor,
         size: selectedSize,
         stock: stockCount,
@@ -215,7 +224,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         productId: String(product.id),
         name: product.name,
         price: product.price,
-        image: product.images[0] || PLACEHOLDER_IMAGE,
+        image: getImageUrl(product.images[0]) || PLACEHOLDER_IMAGE,
         color: selectedColor,
         size: selectedSize,
         stock: stockCount,
@@ -324,7 +333,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
             <div className="product-gallery">
               <div className="main-image">
                 <Image
-                  src={product.images?.[selectedImage] || PLACEHOLDER_IMAGE}
+                  src={getImageUrl(product.images?.[selectedImage]) || PLACEHOLDER_IMAGE}
                   alt={product.name}
                   width={500}
                   height={500}
@@ -353,7 +362,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                     onClick={() => setSelectedImage(index)}
                   >
                     <Image
-                      src={image || PLACEHOLDER_IMAGE}
+                      src={getImageUrl(image) || PLACEHOLDER_IMAGE}
                       alt={`${product.name} ${index + 1}`}
                       width={100}
                       height={100}
@@ -378,13 +387,13 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                 <div className="product-brand">{product.brand}</div>
               </div>
 
-              {/* <div className="product-rating">
+              <div className="product-rating">
                 <div className="stars">
                   {renderStars(Math.floor(product.rating.average))}
                   <span className="rating-text">({product.rating.average})</span>
                 </div>
                 <span className="review-count">{product.rating.count} reviews</span>
-              </div> */}
+              </div>
 
               <div className="product-price">
                 <span className="current-price">${product.price}</span>
@@ -618,7 +627,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                     <div key={relatedProduct.id} className="related-product-item">
                       <div className="product-image">
                         <Image
-                          src={relatedProduct.images?.[0] || PLACEHOLDER_IMAGE}
+                          src={getImageUrl(relatedProduct.images?.[0]) || PLACEHOLDER_IMAGE}
                           alt={relatedProduct.name}
                           width={200}
                           height={200}
@@ -634,10 +643,10 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                       </div>
                       <div className="product-info">
                         <h3>{relatedProduct.name}</h3>
-                        {/* <div className="rating">
+                        <div className="rating">
                           {renderStars(relatedProduct.rating.average)}
                           <span>({relatedProduct.rating.count || 0})</span>
-                        </div> */}
+                        </div>
                         <div className="price">${relatedProduct.price}</div>
                         <button className="quick-add-btn">
                           <i className="bx bx-plus"></i>
