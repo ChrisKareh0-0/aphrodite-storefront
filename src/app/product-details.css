@@ -225,6 +225,7 @@
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 20px 30px -20px rgba(0,0,0,0.25);
+  max-width: 520px;
 }
 
 .aph-pdp .product-header {
@@ -339,6 +340,10 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
+}
+.aph-pdp .color-option {
+  background: #000 !important;
+  color: #fff !important;
 }
 
 .aph-pdp .color-option {
@@ -843,7 +848,7 @@
   .aph-pdp .product-info,
   .aph-pdp .product-tabs,
   .aph-pdp .related-products {
-    max-width: 560px;
+    max-width: 98vw;
     margin: 0 auto;
   }
 
