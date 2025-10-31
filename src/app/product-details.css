@@ -844,8 +844,17 @@
   }
 
   /* Center sections and remove sticky on small screens */
+
+  .aph-pdp .product-info {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
   .aph-pdp .product-gallery,
-  .aph-pdp .product-info,
   .aph-pdp .product-tabs,
   .aph-pdp .related-products {
     max-width: 98vw;

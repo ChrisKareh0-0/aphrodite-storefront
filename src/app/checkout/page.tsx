@@ -10,6 +10,11 @@ import '../checkout.css';
 export default function Checkout() {
   const router = useRouter();
   const { cart, getCartTotal, clearCart } = useCart();
+
+  // Shipping fee logic
+  const subtotal = getCartTotal();
+  const shippingFee = subtotal > 200 ? 0 : 4;
+  const total = subtotal + shippingFee;
   const [loading, setLoading] = useState(false);
   const backendUrl = 'https://aphrodite-admin.onrender.com';
 
@@ -68,10 +73,10 @@ export default function Checkout() {
           color: item.color,
           size: item.size
         })),
-        subtotal: getCartTotal(),
-        shipping: 0,
+        subtotal,
+        shipping: shippingFee,
         tax: 0,
-        total: getCartTotal(),
+        total,
         paymentMethod: formData.paymentMethod,
         notes: formData.notes
       };
@@ -157,7 +162,6 @@ export default function Checkout() {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    placeholder="John Doe"
                   />
                 </div>
               </div>
@@ -172,7 +176,6 @@ export default function Checkout() {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    placeholder="john@example.com"
                   />
                 </div>
 
@@ -185,7 +188,6 @@ export default function Checkout() {
                     value={formData.phone}
                     onChange={handleChange}
                     required
-                    placeholder="+961 81 937 847"
                   />
                 </div>
               </div>
@@ -202,7 +204,6 @@ export default function Checkout() {
                   value={formData.street}
                   onChange={handleChange}
                   required
-                  placeholder="123 Main St, Apt 4"
                 />
               </div>
 
@@ -216,7 +217,6 @@ export default function Checkout() {
                     value={formData.city}
                     onChange={handleChange}
                     required
-                    placeholder="New York"
                   />
                 </div>
 
@@ -229,7 +229,6 @@ export default function Checkout() {
                     value={formData.state}
                     onChange={handleChange}
                     required
-                    placeholder="NY"
                   />
                 </div>
               </div>
@@ -244,7 +243,6 @@ export default function Checkout() {
                     value={formData.zipCode}
                     onChange={handleChange}
                     required
-                    placeholder="10001"
                   />
                 </div>
 
@@ -295,7 +293,6 @@ export default function Checkout() {
                   name="notes"
                   value={formData.notes}
                   onChange={handleChange}
-                  placeholder="Any special instructions for your order?"
                   rows={4}
                 />
               </div>
@@ -340,19 +337,19 @@ export default function Checkout() {
             </div>
 
             <div className="summary-totals">
-              <div className="summary-row">
-                <span>Subtotal</span>
-                <span>${getCartTotal().toFixed(2)}</span>
-              </div>
-              <div className="summary-row">
-                <span>Shipping</span>
-                <span>FREE</span>
-              </div>
-              <div className="summary-divider"></div>
-              <div className="summary-row total-row">
-                <span>Total</span>
-                <span>${getCartTotal().toFixed(2)}</span>
-              </div>
+                <div className="summary-row">
+                  <span>Subtotal</span>
+                  <span>${subtotal.toFixed(2)}</span>
+                </div>
+                <div className="summary-row">
+                  <span>Shipping</span>
+                  <span>{shippingFee === 0 ? 'FREE' : `$${shippingFee.toFixed(2)}`}</span>
+                </div>
+                <div className="summary-divider"></div>
+                <div className="summary-row total-row">
+                  <span>Total</span>
+                  <span>${total.toFixed(2)}</span>
+                </div>
             </div>
           </div>
         </div>

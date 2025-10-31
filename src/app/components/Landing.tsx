@@ -143,9 +143,6 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="collection">
-        <CategoriesGallery />
-      </section>
 
       <section id="new-collection">
         <HorizontalProductCarousel
@@ -154,6 +151,10 @@ export default function Landing() {
           query="isFeatured=true&limit=10"
           isNewCollection={true}
         />
+      </section>
+
+      <section id="collection">
+        <CategoriesGallery />
       </section>
 
       {/* <section id="sellers">
