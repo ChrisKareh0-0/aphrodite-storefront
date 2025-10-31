@@ -358,10 +358,12 @@
 
 .aph-pdp .color-option.active,
 .aph-pdp .size-option.active {
-  border-color: #1e293b;
+  border-color: #fff !important;
+  box-shadow: 0 0 0 2px #1e293b;
   background: #1e293b;
   color: white;
   transform: translateY(-2px);
+  z-index: 1;
 }
 
 .aph-pdp .color-option:hover,

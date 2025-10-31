@@ -30,7 +30,6 @@ interface Product {
   description: string;
   category: { _id: string; name: string; slug: string };
   brand?: string;
-  rating: { average: number; count: number };
   images: string[];
   colors: (string | ColorOption)[];
   sizes: (string | SizeOption)[];
@@ -40,15 +39,7 @@ interface Product {
   specifications: Record<string, string>;
 }
 
-interface Review {
-  id: number;
-  userId: number;
-  userName: string;
-  rating: number;
-  comment: string;
-  date: string;
-  verified: boolean;
-}
+
 
 interface ProductDetailsPageProps {
   productId: string;
@@ -58,7 +49,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
   const router = useRouter();
   const { addToCart } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
-  const [reviews, setReviews] = useState<Review[]>([]);
+  // Removed reviews
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -151,24 +142,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
     }
   }, [productId, router]);
 
-  const fetchProductReviews = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/products/${productId}/reviews`);
 
-      if (!response.ok) {
-        // Reviews are optional, just log the error
-        console.warn('No reviews available');
-        setReviews([]);
-        return;
-      }
-
-      const { reviews: data } = await response.json();
-      setReviews(data || []);
-    } catch (err) {
-      console.warn('Error fetching reviews:', err);
-      setReviews([]);
-    }
-  }, [productId]);
 
   const fetchRelatedProducts = useCallback(async () => {
     try {
@@ -197,9 +171,9 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
   // Fetch data when component mounts or product ID changes
   useEffect(() => {
     fetchProductDetails();
-    fetchProductReviews();
+  // Removed fetchProductReviews
     fetchRelatedProducts();
-  }, [productId, fetchProductDetails, fetchProductReviews, fetchRelatedProducts]);
+  }, [productId, fetchProductDetails, fetchRelatedProducts]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -281,11 +255,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
     }, 3000);
   };
 
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <i key={i} className={`bx ${i < rating ? 'bxs-star' : 'bx-star'}`}></i>
-    ));
-  };
+
 
   if (loading) {
     return (
@@ -422,13 +392,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                 <div className="product-brand">{product.brand}</div>
               </div>
 
-              <div className="product-rating">
-                <div className="stars">
-                  {renderStars(Math.floor(product.rating.average))}
-                  <span className="rating-text">({product.rating.average})</span>
-                </div>
-                <span className="review-count">{product.rating.count} reviews</span>
-              </div>
+
 
               <div className="product-price">
                 <span className="current-price">${product.price}</span>
@@ -568,12 +532,6 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
               >
                 Specifications
               </button>
-              <button
-                className={`tab-header ${activeTab === 'reviews' ? 'active' : ''}`}
-                onClick={() => setActiveTab('reviews')}
-              >
-                Reviews ({reviews.length})
-              </button>
             </div>
 
             <div className="tab-content">
@@ -608,47 +566,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                 </div>
               )}
 
-              {activeTab === 'reviews' && (
-                <div className="tab-panel">
-                  <div className="reviews-summary">
-                    <h3>Customer Reviews</h3>
-                    <div className="rating-summary">
-                      <div className="average-rating">
-                        <span className="rating-number">{product.rating.average}</span>
-                        <div className="stars">
-                          {renderStars(Math.floor(product.rating.average))}
-                        </div>
-                        <span>Based on {product.rating.count} reviews</span>
-                      </div>
-                    </div>
-                  </div>
 
-                  <div className="reviews-list">
-                    {reviews.map((review) => (
-                      <div key={review.id} className="review-item">
-                        <div className="review-header">
-                          <div className="reviewer-info">
-                            <span className="reviewer-name">{review.userName}</span>
-                            {review.verified && (
-                              <span className="verified-badge">
-                                <i className="bx bx-check-shield"></i>
-                                Verified Purchase
-                              </span>
-                            )}
-                          </div>
-                          <div className="review-rating">
-                            {renderStars(review.rating)}
-                          </div>
-                        </div>
-                        <div className="review-content">
-                          <p>{review.comment}</p>
-                          <span className="review-date">{new Date(review.date).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
@@ -678,10 +596,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                       </div>
                       <div className="product-info">
                         <h3>{relatedProduct.name}</h3>
-                        <div className="rating">
-                          {renderStars(relatedProduct.rating.average)}
-                          <span>({relatedProduct.rating.count || 0})</span>
-                        </div>
+                        
                         <div className="price">${relatedProduct.price}</div>
                         <button className="quick-add-btn">
                           <i className="bx bx-plus"></i>
