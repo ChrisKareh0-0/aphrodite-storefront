@@ -315,6 +315,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
     );
   }
 
+
   // Fullscreen image handler
   const openFullscreen = (imgUrl: string) => {
     if (!imgUrl) return;
@@ -388,34 +389,6 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                   <i className={`bx ${isWishlisted ? 'bxs-heart' : 'bx-heart'}`}></i>
                 </button>
               </div>
-  // Fullscreen image handler
-  const openFullscreen = (imgUrl: string) => {
-    if (!imgUrl) return;
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100vw';
-    overlay.style.height = '100vh';
-    overlay.style.background = 'rgba(0,0,0,0.95)';
-    overlay.style.display = 'flex';
-    overlay.style.alignItems = 'center';
-    overlay.style.justifyContent = 'center';
-    overlay.style.zIndex = '9999';
-    overlay.style.cursor = 'zoom-out';
-    overlay.onclick = () => document.body.removeChild(overlay);
-    // Create image
-    const img = document.createElement('img');
-    img.src = imgUrl;
-    img.style.maxWidth = '90vw';
-    img.style.maxHeight = '90vh';
-    img.style.borderRadius = '16px';
-    img.style.boxShadow = '0 8px 40px rgba(0,0,0,0.5)';
-    img.alt = 'Product Image';
-    overlay.appendChild(img);
-    document.body.appendChild(overlay);
-  };
               <div className="thumbnail-gallery">
                 {product.images.map((image, index) => (
                   <button
