@@ -52,7 +52,7 @@ export default function WhatsAppButton() {
         .whatsapp-icon {
           width: 32px;
           height: 32px;
-          color: white;
+          color: white !important;
           display: flex;
           align-items: center;
           justify-content: center;
