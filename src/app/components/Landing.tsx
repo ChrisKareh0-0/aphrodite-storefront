@@ -85,7 +85,7 @@ export default function Landing() {
         <InteractiveDots />
         <section id="home">
         <div className="home_page ">
-          <div className="home_img ">
+          <div className="home_img hero-image-wrapper">
             <Image
               src={heroData.imageUrl}
               alt="home image"
@@ -93,33 +93,53 @@ export default function Landing() {
               height={400}
               priority
             />
-          </div>
-          <div className="home_txt ">
-            <p className="collectio ">{heroData?.title || 'SUMMER COLLECTION'}</p>
-            <h2>
-              {(heroData?.heading || 'FALL - WINTER\nCollection 2025').split('\n').map((line, index) => (
-                <span key={index}>
-                  {line}
-                  {index < (heroData?.heading || 'FALL - WINTER\nCollection 2025').split('\n').length - 1 && <br />}
-                </span>
-              ))}
-            </h2>
-            <div className="home_label ">
-              <p>
-                {(heroData?.description || 'A specialist label creating luxury essentials. Ethically crafted with an unwavering commitment to exceptional quality.').split('\n').map((line, index) => (
-                  <span key={index}>
-                    {line}
-                    {index < (heroData?.description || 'A specialist label creating luxury essentials. Ethically crafted with an unwavering commitment to exceptional quality.').split('\n').length - 1 && <br />}
-                  </span>
-                ))}
-              </p>
-            </div>
-            <button>
+            <button className="hero-float-btn">
               <a href={heroData?.buttonLink || '#new-collection'}>{heroData?.buttonText || 'New Collection'}</a>
               <i className="bx bx-right-arrow-alt"></i>
             </button>
-
           </div>
+          <div className="home_txt ">
+            {/* ...existing code... */}
+          </div>
+      <style jsx>{`
+        .hero-image-wrapper {
+          position: relative;
+        }
+        .hero-float-btn {
+          position: absolute;
+          bottom: 24px;
+          right: 24px;
+          background: #000;
+          color: #fff;
+          border: none;
+          border-radius: 32px;
+          padding: 0.75em 1.5em;
+          font-size: 1.1em;
+          display: flex;
+          align-items: center;
+          gap: 0.5em;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+          cursor: pointer;
+          z-index: 2;
+          transition: background 0.2s;
+        }
+        .hero-float-btn:hover {
+          background: #222;
+        }
+        .hero-float-btn a {
+          color: inherit;
+          text-decoration: none;
+          font-weight: 500;
+        }
+        @media (max-width: 600px) {
+          .hero-float-btn {
+            bottom: 12px;
+            right: 12px;
+            font-size: 1em;
+            padding: 0.6em 1.1em;
+          }
+        }
+      `}</style>
         </div>
       </section>
 
@@ -613,7 +633,7 @@ export default function Landing() {
               <i className="bx bx-phone"></i>
               <div>
                 <span className="contact-label">Phone</span>
-                <a href="tel:+1234567890" className="contact-value">+961 81 937 847</a>
+                <a href="tel:+96181937847" className="contact-value">+961 81 937 847</a>
               </div>
             </div>
             <div className="contact-item">

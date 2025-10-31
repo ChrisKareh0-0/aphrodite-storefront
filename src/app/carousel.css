@@ -279,7 +279,8 @@ Carousel Styles
 .product-item img {
   width: 100%;
   height: 80px;
-  object-fit: cover;
+  object-fit: contain;
+  background: #fff;
   border-radius: 4px;
   margin-bottom: 0.5rem;
 }
