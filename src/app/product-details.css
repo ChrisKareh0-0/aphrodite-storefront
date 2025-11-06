@@ -340,10 +340,29 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
+  position: relative;
 }
+
+.aph-pdp .color-option.out-of-stock {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f3f4f6 !important;
+  text-decoration: line-through;
+}
+
 .aph-pdp .color-option {
   background: #000 !important;
   color: #fff !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.aph-pdp .color-stock {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  font-weight: 400;
 }
 
 .aph-pdp .color-option {
@@ -354,6 +373,23 @@
   padding: 0.75rem 1rem;
   min-width: 48px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.aph-pdp .size-option.out-of-stock {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f3f4f6;
+  text-decoration: line-through;
+}
+
+.aph-pdp .size-stock {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  font-weight: 400;
 }
 
 .aph-pdp .color-option.active,
@@ -366,7 +402,7 @@
   z-index: 1;
 }
 
-.aph-pdp .color-option:hover,
+.aph-pdp .color-option:hover:not(:disabled):not(.out-of-stock),
 .aph-pdp .size-option:hover {
   border-color: #1e293b;
   transform: translateY(-2px);
@@ -416,6 +452,80 @@
   font-size: 0.875rem;
   color: #16a34a;
   font-weight: 500;
+}
+
+.aph-pdp .out-of-stock-text {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* Stock Availability Table */
+.aph-pdp .stock-table {
+  margin-top: 0.5rem;
+}
+
+.aph-pdp .stock-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.aph-pdp .stock-table thead {
+  background: #f8fafc;
+}
+
+.aph-pdp .stock-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #475569;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.aph-pdp .stock-table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.aph-pdp .stock-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.aph-pdp .stock-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.aph-pdp .stock-table tbody tr.selected-variation {
+  background: #e0f2fe;
+  font-weight: 600;
+}
+
+.aph-pdp .qty-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+.aph-pdp .qty-badge.low-stock {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.aph-pdp .out-of-stock-note {
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+  font-style: italic;
 }
 
 /* Action Buttons */
@@ -684,6 +794,8 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
 .aph-pdp .related-product-item:hover {
@@ -709,13 +821,30 @@
 
 .aph-pdp .related-product-item .product-info {
   padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  flex: 1;
 }
 
 .aph-pdp .related-product-item h3 {
-  font-size: 1.125rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: #1e293b;
   margin-bottom: 0.75rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  min-height: 2.8em;
+  max-height: 2.8em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .aph-pdp .related-product-item .rating {
@@ -729,7 +858,7 @@
   font-size: 1.25rem;
   font-weight: 700;
   color: #1e293b;
-  margin-bottom: 1rem;
+  margin-bottom: auto;
 }
 
 .aph-pdp .quick-add-btn {
@@ -746,6 +875,12 @@
   justify-content: center;
   gap: 0.5rem;
   transition: background-color 0.3s ease;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.aph-pdp .quick-add-btn i {
+  font-size: 1.2rem;
 }
 
 .aph-pdp .quick-add-btn:hover {
@@ -836,7 +971,7 @@
   }
 
   .aph-pdp .related-products-grid {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
 

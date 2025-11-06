@@ -764,8 +764,8 @@
   }
 
   .products-grid-centered {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
     padding: 0;
   }
 

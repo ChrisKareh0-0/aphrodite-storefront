@@ -21,6 +21,14 @@ interface NavItem {
   icon: string;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+}
+
 export default function CenterNavbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
@@ -30,6 +38,8 @@ export default function CenterNavbar() {
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const router = useRouter();
   const { cart, removeFromCart, updateQuantity, getCartTotal, getCartCount } = useCart();
 
@@ -87,6 +97,25 @@ export default function CenterNavbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [navItems]);
 
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories');
+        if (!response.ok) {
+          throw new Error('Failed to fetch categories');
+        }
+        const data = await response.json();
+        setCategories(data.categories || []);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setCategories([]);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -143,10 +172,6 @@ export default function CenterNavbar() {
   const goToCart = () => {
     setIsCartOpen(false);
     router.push('/cart');
-  };
-
-  const toggleProfile = () => {
-    setIsProfileOpen(!isProfileOpen);
   };
 
   // Close dropdowns when clicking outside
@@ -421,28 +446,70 @@ export default function CenterNavbar() {
           {/* Mobile Menu Header with Close Button */}
           <div className="center-navbar__mobile-header">
             <div className="center-navbar__mobile-logo">
-              {/* <h3>APHRODITE</h3> */}
+              <h3>MENU</h3>
             </div>
             <button
               className="center-navbar__mobile-close"
               onClick={toggleMobileMenu}
               aria-label="Close menu"
             >
-              {/* <i className="bx bx-x"></i> */}
+              <i className="bx bx-x"></i>
             </button>
           </div>
 
           <div className="center-navbar__mobile-nav">
-            {navItems.map((item) => (
-              <button
-                key={`mobile-${item.id}`}
-                className={`center-navbar__mobile-nav-item ${activeSection === item.id ? 'active' : ''}`}
-                onClick={() => handleNavClick(item.id)}
-              >
-                <i className={`bx ${item.icon}`}></i>
-                <span>{item.label}</span>
-              </button>
-            ))}
+            {navItems.map((item) => {
+              // Replace "Shop" with Categories dropdown
+              if (item.id === 'shop') {
+                return (
+                  <div key={`mobile-${item.id}`} className="center-navbar__mobile-categories-wrapper">
+                    <button
+                      className={`center-navbar__mobile-categories-toggle ${isCategoriesOpen ? 'active' : ''}`}
+                      onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <i className={`bx ${item.icon}`}></i>
+                        <span>Categories</span>
+                      </div>
+                      <i className={`bx bx-chevron-down toggle-icon`}></i>
+                    </button>
+                    <div className={`center-navbar__mobile-categories-list ${isCategoriesOpen ? 'active' : ''}`}>
+                      {categories.length === 0 ? (
+                        <div style={{ padding: '0.75rem 1rem', color: '#94a3b8', fontSize: '0.9rem' }}>
+                          Loading categories...
+                        </div>
+                      ) : (
+                        categories.map((category) => (
+                          <button
+                            key={category.id}
+                            className="center-navbar__mobile-category-item"
+                            onClick={() => {
+                              router.push(`/products?category=${encodeURIComponent(category.name)}`);
+                              setIsMobileMenuOpen(false);
+                              setIsCategoriesOpen(false);
+                            }}
+                          >
+                            <i className="bx bx-right-arrow-alt"></i>
+                            <span>{category.name}</span>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+              
+              return (
+                <button
+                  key={`mobile-${item.id}`}
+                  className={`center-navbar__mobile-nav-item ${activeSection === item.id ? 'active' : ''}`}
+                  onClick={() => handleNavClick(item.id)}
+                >
+                  <i className={`bx ${item.icon}`}></i>
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
           </div>
           <div className="center-navbar__mobile-actions">
             <button className="center-navbar__mobile-action-btn">

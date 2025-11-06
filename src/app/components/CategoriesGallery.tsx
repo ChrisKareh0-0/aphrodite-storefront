@@ -231,13 +231,14 @@ export default function CategoriesGallery() {
     router.push(`/products?category=${encodeURIComponent(categoryName)}`);
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveCategory((prev) => (prev + 1) % categories.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [categories.length]);
+  // Removed automatic category switching
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setActiveCategory((prev) => (prev + 1) % categories.length);
+  //   }, 5000);
+  //
+  //   return () => clearInterval(interval);
+  // }, [categories.length]);
 
   const handleCategoryClick = (index: number) => {
     setActiveCategory(index);
@@ -392,6 +393,17 @@ export default function CategoriesGallery() {
               <span className="sr-only">Go to category {index + 1}</span>
             </button>
           ))}
+        </div>
+
+        {/* View All Button */}
+        <div className="categories-gallery__view-all-container">
+          <button 
+            className="categories-gallery__view-all-btn"
+            onClick={() => handleViewAllClick(categories[activeCategory]?.title || '')}
+          >
+            View All {categories[activeCategory]?.title || 'Products'}
+            <i className="bx bx-right-arrow-alt"></i>
+          </button>
         </div>
 
       </div>

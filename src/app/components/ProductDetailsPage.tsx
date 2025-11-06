@@ -60,6 +60,35 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState("description");
 
+  // Get available stock for selected color/size combination
+  const getAvailableStock = useCallback((color?: string, size?: string) => {
+    if (!product?.stock) return 0;
+    
+    const stockItem = product.stock.find(
+      (item) => item.color === (color || selectedColor) && item.size === (size || selectedSize)
+    );
+    
+    return stockItem?.quantity || 0;
+  }, [product, selectedColor, selectedSize]);
+
+  // Get stock for a specific color (sum across all sizes)
+  const getColorStock = useCallback((color: string) => {
+    if (!product?.stock) return 0;
+    
+    return product.stock
+      .filter((item) => item.color === color)
+      .reduce((total, item) => total + item.quantity, 0);
+  }, [product]);
+
+  // Get stock for a specific size (sum across all colors)
+  const getSizeStock = useCallback((size: string) => {
+    if (!product?.stock) return 0;
+    
+    return product.stock
+      .filter((item) => item.size === size)
+      .reduce((total, item) => total + item.quantity, 0);
+  }, [product]);
+
   const fetchProductDetails = useCallback(async () => {
     try {
       setLoading(true);
@@ -161,13 +190,6 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
       setRelatedProducts([]);
     }
   }, [productId]);
-  
-  // Calculate stock count from stock array
-  const stockCount = product?.stock?.reduce((total, item) => total + item.quantity, 0) || 0;
-  
-  // Check if product is in stock
-  const isInStock = stockCount > 0;
-
   // Fetch data when component mounts or product ID changes
   useEffect(() => {
     fetchProductDetails();
@@ -175,8 +197,22 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
     fetchRelatedProducts();
   }, [productId, fetchProductDetails, fetchRelatedProducts]);
 
+  // Calculate current available stock based on selection
+  const currentStock = getAvailableStock();
+  const isInStock = currentStock > 0;
+
   const handleAddToCart = () => {
     if (!product) return;
+
+    if (currentStock === 0) {
+      toast.error('This item is out of stock');
+      return;
+    }
+
+    if (quantity > currentStock) {
+      toast.error(`Only ${currentStock} items available`);
+      return;
+    }
 
     try {
       addToCart({
@@ -186,7 +222,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         image: getImageUrl(product.images[0]) || PLACEHOLDER_IMAGE,
         color: selectedColor,
         size: selectedSize,
-        stock: stockCount,
+        stock: currentStock,
         quantity,
       });
     } catch (err) {
@@ -198,6 +234,16 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
   const handleBuyNow = () => {
     if (!product) return;
 
+    if (currentStock === 0) {
+      toast.error('This item is out of stock');
+      return;
+    }
+
+    if (quantity > currentStock) {
+      toast.error(`Only ${currentStock} items available`);
+      return;
+    }
+
     try {
       addToCart({
         productId: String(product.id),
@@ -206,7 +252,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         image: getImageUrl(product.images[0]) || PLACEHOLDER_IMAGE,
         color: selectedColor,
         size: selectedSize,
-        stock: stockCount,
+        stock: currentStock,
         quantity,
       });
 
@@ -417,17 +463,19 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                   <div className="color-options">
                     {product.colors.map((color, idx) => {
                       const colorName = typeof color === 'string' ? color : color.name;
-                      const colorCode = typeof color === 'object' && color.code ? color.code : undefined;
+                      const colorStock = getColorStock(colorName);
                       const colorKey = typeof color === 'string' ? color : `${color.name}-${idx}`;
                       return (
                         <button
                           key={colorKey}
-                          className={`color-option ${selectedColor === colorName ? 'active' : ''}`}
+                          className={`color-option ${selectedColor === colorName ? 'active' : ''} ${colorStock === 0 ? 'out-of-stock' : ''}`}
                           onClick={() => setSelectedColor(colorName)}
-                          title={colorName}
+                          title={`${colorName} - ${colorStock > 0 ? `${colorStock} available` : 'Out of stock'}`}
                           style={{ backgroundColor: '#000', color: '#fff' }}
+                          disabled={colorStock === 0}
                         >
                           <span className="color-name">{colorName}</span>
+                          <span className="color-stock">{colorStock > 0 ? `(${colorStock})` : '(Out)'}</span>
                         </button>
                       );
                     })}
@@ -442,14 +490,18 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                   <div className="size-options">
                     {product.sizes.map((size, idx) => {
                       const sizeName = typeof size === 'string' ? size : size.name;
+                      const sizeStock = getSizeStock(sizeName);
                       const sizeKey = typeof size === 'string' ? size : `${size.name}-${idx}`;
                       return (
                         <button
                           key={sizeKey}
-                          className={`size-option ${selectedSize === sizeName ? 'active' : ''}`}
+                          className={`size-option ${selectedSize === sizeName ? 'active' : ''} ${sizeStock === 0 ? 'out-of-stock' : ''}`}
                           onClick={() => setSelectedSize(sizeName)}
+                          title={`${sizeName} - ${sizeStock > 0 ? `${sizeStock} available` : 'Out of stock'}`}
+                          disabled={sizeStock === 0}
                         >
-                          {sizeName}
+                          <span className="size-name">{sizeName}</span>
+                          <span className="size-stock">{sizeStock > 0 ? `(${sizeStock})` : '(Out)'}</span>
                         </button>
                       );
                     })}
@@ -469,16 +521,72 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                   </button>
                   <span>{quantity}</span>
                   <button
-                    onClick={() => setQuantity(Math.min(stockCount, quantity + 1))}
-                    disabled={quantity >= stockCount}
+                    onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
+                    disabled={quantity >= currentStock}
                   >
                     <i className="bx bx-plus"></i>
                   </button>
                 </div>
                 <span className="stock-info">
-                  {stockCount > 5 ? 'In Stock' : `Only ${stockCount} left`}
+                  {currentStock === 0 ? (
+                    <span className="out-of-stock-text">Out of Stock</span>
+                  ) : currentStock > 5 ? (
+                    'In Stock'
+                  ) : (
+                    `Only ${currentStock} left`
+                  )}
                 </span>
               </div>
+
+              {/* Stock Availability Table */}
+              {product.stock && product.stock.length > 0 && (
+                <div className="product-options">
+                  <h3>Stock Availability</h3>
+                  <div className="stock-table">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Color</th>
+                          <th>Size</th>
+                          <th>Quantity</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {product.stock
+                          .filter(item => item.quantity > 0)
+                          .sort((a, b) => {
+                            // Sort by color first, then by size
+                            if (a.color !== b.color) return (a.color || '').localeCompare(b.color || '');
+                            return (a.size || '').localeCompare(b.size || '');
+                          })
+                          .map((item, idx) => (
+                            <tr 
+                              key={idx}
+                              className={
+                                item.color === selectedColor && item.size === selectedSize 
+                                  ? 'selected-variation' 
+                                  : ''
+                              }
+                            >
+                              <td>{item.color || 'N/A'}</td>
+                              <td>{item.size || 'N/A'}</td>
+                              <td>
+                                <span className={`qty-badge ${item.quantity < 5 ? 'low-stock' : ''}`}>
+                                  {item.quantity}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                    {product.stock.filter(item => item.quantity === 0).length > 0 && (
+                      <p className="out-of-stock-note">
+                        * Some variations are out of stock
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="product-actions">
@@ -577,7 +685,11 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
               <div className="related-products-grid">
                 {relatedProducts.map((relatedProduct) => {
                   return (
-                    <div key={relatedProduct.id} className="related-product-item">
+                    <div 
+                      key={relatedProduct.id} 
+                      className="related-product-item"
+                      onClick={() => router.push(`/product/${relatedProduct.slug || relatedProduct.id}`)}
+                    >
                       <div className="product-image">
                         <Image
                           src={getImageUrl(relatedProduct.images?.[0]) || PLACEHOLDER_IMAGE}
@@ -598,10 +710,6 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                         <h3>{relatedProduct.name}</h3>
                         
                         <div className="price">${relatedProduct.price}</div>
-                        <button className="quick-add-btn">
-                          <i className="bx bx-plus"></i>
-                          Add to Cart
-                        </button>
                       </div>
                     </div>
                   );

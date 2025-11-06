@@ -47,6 +47,24 @@ export default function Checkout() {
       return;
     }
 
+    // Validate stock availability
+    const outOfStockItems = cart.filter(item => item.stock === 0);
+    const exceedsStockItems = cart.filter(item => item.quantity > item.stock);
+
+    if (outOfStockItems.length > 0) {
+      console.warn('⚠️ Attempted checkout with out of stock items:', outOfStockItems);
+      toast.error('Some items in your cart are out of stock. Please remove them before checkout.');
+      router.push('/cart');
+      return;
+    }
+
+    if (exceedsStockItems.length > 0) {
+      console.warn('⚠️ Attempted checkout with items exceeding stock:', exceedsStockItems);
+      toast.error('Some items exceed available stock. Please adjust quantities.');
+      router.push('/cart');
+      return;
+    }
+
     setLoading(true);
     console.log('🛒 Starting checkout process...');
 
