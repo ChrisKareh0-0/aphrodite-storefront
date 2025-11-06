@@ -16,7 +16,9 @@ export default function Checkout() {
   const shippingFee = subtotal > 200 ? 0 : 4;
   const total = subtotal + shippingFee;
   const [loading, setLoading] = useState(false);
-  const backendUrl = 'https://aphrodite-admin.onrender.com';
+  const backendUrl = process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:3001' 
+    : 'https://aphrodite-admin.onrender.com';
 
   const [formData, setFormData] = useState({
     name: '',

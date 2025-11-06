@@ -131,7 +131,19 @@ export default function CenterNavbar() {
   };
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+    const newState = !isMobileMenuOpen;
+    setIsMobileMenuOpen(newState);
+    
+    // Prevent body scroll when menu is open
+    if (newState) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
   };
 
   const handleNavClick = (id: string) => {
@@ -192,6 +204,25 @@ export default function CenterNavbar() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isSearchOpen, isCartOpen, isProfileOpen]);
+
+  // Cleanup body styles when component unmounts or menu closes
+  useEffect(() => {
+    return () => {
+      // Reset body styles on component unmount
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, []);
+
+  // Reset body styles when menu closes
+  useEffect(() => {
+    if (!isMobileMenuOpen) {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+  }, [isMobileMenuOpen]);
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
