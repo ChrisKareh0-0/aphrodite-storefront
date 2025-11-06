@@ -84,6 +84,13 @@
   --sidebar-ring: oklch(0.709 0.01 56.259);
 }
 
+/* iOS safe area helper: ensures elements (like fixed nav) are not hidden under the notch/status bar */
+.safe-top {
+  /* legacy constant() for older Safari, then env() */
+  padding-top: constant(safe-area-inset-top);
+  padding-top: env(safe-area-inset-top);
+}
+
 .dark {
   --background: oklch(0.147 0.004 49.25);
   --foreground: oklch(0.985 0.001 106.423);
