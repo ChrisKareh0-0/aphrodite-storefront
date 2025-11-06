@@ -555,6 +555,14 @@
 @media (max-width: 768px) {
   .center-navbar__container {
     padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .center-navbar__logo {
+    flex: 0 0 auto;
+    order: 1;
   }
 
   .center-navbar__nav {
@@ -563,6 +571,10 @@
 
   .center-navbar__actions {
     display: flex;
+    gap: 0.5rem;
+    order: 3;
+    flex: 0 0 auto;
+    margin-left: auto;
   }
 
   .center-navbar__search-container,
@@ -570,8 +582,15 @@
     display: none;
   }
 
+  /* Keep cart visible on mobile */
+  .center-navbar__cart-container {
+    display: flex;
+  }
+
   .center-navbar__mobile-toggle {
     display: flex;
+    order: 4;
+    margin-left: 0.5rem;
   }
 
   .center-navbar__spacer {
