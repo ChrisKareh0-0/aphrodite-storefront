@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import toast from 'react-hot-toast';
-import { PLACEHOLDER_IMAGE, BACKEND_URL } from '@/constants';
+import { PLACEHOLDER_IMAGE, BACKEND_URL, getImageUrl } from '@/constants';
 
 interface Product {
   id: number | string;
@@ -364,7 +364,7 @@ export default function ProductsPage() {
                       <div className="product-image">
                         {product.images?.[0] ? (
                           (() => {
-                            const imgSrc = (typeof product.images[0] === 'string' && product.images[0].trim()) ? product.images[0] : PLACEHOLDER_IMAGE;
+                            const imgSrc = getImageUrl((typeof product.images[0] === 'string' && product.images[0].trim()) ? product.images[0] : null) || PLACEHOLDER_IMAGE;
                             return (
                               <img
                                 src={imgSrc}

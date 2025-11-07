@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { PLACEHOLDER_IMAGE, BACKEND_URL } from "@/constants";
+import { PLACEHOLDER_IMAGE } from "@/constants";
 import InteractiveDots from "./InteractiveDots";
 import CategoriesGallery from "./CategoriesGallery";
 import CenterNavbar from "./CenterNavbar";
@@ -38,8 +38,10 @@ export default function Landing() {
   useEffect(() => {
     (async () => {
       try {
-  console.log('🔄 Fetching hero data from:', `${BACKEND_URL}/api/hero`);
-  const response = await fetch(`${BACKEND_URL}/api/hero`);
+        // Fetch from the storefront's local API route which in turn queries the backend
+        // This avoids calling the backend directly and ensures the route normalizes image URLs
+        console.log('🔄 Fetching hero data from local API: /api/hero');
+        const response = await fetch('/api/hero');
         console.log('📡 Hero API Response Status:', response.status);
         const data = await response.json();
         console.log('✅ Hero data:', data);
@@ -55,7 +57,7 @@ export default function Landing() {
         setHeroData(newHeroData);
       } catch (error) {
         console.error('❌ Error fetching hero data:', error);
-        console.log('⚠️ Using default hero data:', heroData);
+        console.log('⚠️ Using default hero data');
         // Keep default values on error
       } finally {
         setLoading(false);

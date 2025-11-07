@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { BACKEND_URL } from "@/constants";
+import { BACKEND_URL, getImageUrl, PLACEHOLDER_IMAGE } from "@/constants";
 import { fetchWithConfig } from "@/utils/fetchWithConfig";
 
 interface Product {
@@ -141,27 +141,25 @@ export default function CategoriesGallery() {
                 return null;
               }
 
-            // Handle relative image paths from backend
-            const categoryImage = cat.image
-              ? (cat.image.startsWith('http') ? cat.image : `${BACKEND_URL}${cat.image}`)
-              : "https://i.postimg.cc/Xqmwr12c/clothing.webp";
+            // Resolve category image to absolute URL
+            const categoryImage = getImageUrl(cat.image) || "https://i.postimg.cc/Xqmwr12c/clothing.webp";
 
-            // Map the products data, ensuring proper image URL handling
+            // Map the products data, ensuring proper image URL handling using getImageUrl
             // Limit to 4 products maximum
             const mappedProducts = (productsData.products || []).map((prod: BackendProduct) => ({
               ...prod,
-              images: (prod.images || []).map((img: string | { url: string }) => 
-                typeof img === 'string' 
-                  ? (img.startsWith('http') ? img : `${BACKEND_URL}${img}`)
-                  : (img.url ? (img.url.startsWith('http') ? img.url : `${BACKEND_URL}${img.url}`) : '')
-              ).filter(Boolean)
+              images: (prod.images || []).map((img: string | { url: string }) => {
+                if (typeof img === 'string') return getImageUrl(img) || '';
+                if (img && (img as any).url) return getImageUrl((img as any).url) || '';
+                return '';
+              }).filter(Boolean)
             })).slice(0, 4);
 
             // Ensure each product has at least one image
             mappedProducts.forEach((prod: BackendProduct) => {
               if (!prod.images || prod.images.length === 0) {
                 console.warn(`⚠️ No images found for product "${prod.name}", using placeholder`);
-                prod.images = ['/placeholder-product.svg'];
+                prod.images = [PLACEHOLDER_IMAGE];
               }
             });
 
@@ -279,7 +277,7 @@ export default function CategoriesGallery() {
           {collectionSettings.imageUrl && (
             <div className="categories-gallery__header-image">
               <Image
-                src={collectionSettings.imageUrl}
+                src={getImageUrl(collectionSettings.imageUrl)}
                 alt={collectionSettings.title}
                 width={1200}
                 height={300}
@@ -350,14 +348,14 @@ export default function CategoriesGallery() {
                         <div className="categories-gallery__product-image-wrapper" onClick={() => handleProductClick(product.slug || String(product.id))}>
                           <div className="categories-gallery__product-image">
                             <Image
-                              src={product.images?.[0] || '/placeholder-product.svg'}
+                              src={product.images?.[0] || PLACEHOLDER_IMAGE}
                               alt={product.name}
                               width={400}
                               height={400}
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
-                                target.src = '/placeholder-product.svg';
+                                target.src = PLACEHOLDER_IMAGE;
                               }}
                               unoptimized
                             />

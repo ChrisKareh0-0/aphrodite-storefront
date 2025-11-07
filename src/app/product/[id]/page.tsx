@@ -25,7 +25,7 @@ export default function ProductPage({ params }: ProductPageProps) {
   return <ProductDetailsPage productId={productSlug} />;
 }
 
-import { BACKEND_URL } from '@/constants';
+import { BACKEND_URL, getImageUrl, PLACEHOLDER_IMAGE } from '@/constants';
 export async function generateMetadata({ params }: ProductPageProps) {
   const productId = params.id;
   try {
@@ -53,14 +53,14 @@ export async function generateMetadata({ params }: ProductPageProps) {
       openGraph: {
         title: product.name,
         description: product.description,
-        images: [product.images?.[0] || 'https://aphrodite-admin.onrender.com/images/placeholder.svg'],
+  images: [getImageUrl(product.images?.[0]) || PLACEHOLDER_IMAGE],
         type: 'website'
       },
       twitter: {
         card: 'summary_large_image',
         title: product.name,
         description: product.description,
-        images: [product.images?.[0] || 'https://aphrodite-admin.onrender.com/images/placeholder.svg']
+  images: [getImageUrl(product.images?.[0]) || PLACEHOLDER_IMAGE]
       }
     };
   } catch (error) {

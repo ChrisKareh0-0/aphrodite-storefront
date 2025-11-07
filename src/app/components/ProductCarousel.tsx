@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { getImageUrl } from "@/constants";
 
 interface Product {
   id: number;
@@ -346,7 +347,7 @@ export default function ProductCarousel() {
                       {category.bestSellers.map((product: Product, pidx: number) => (
                         <div key={pidx} className="product-item" onClick={() => handleProductClick(product.id)}>
                           <Image
-                            src={(typeof product.images?.[0] === 'string' && product.images[0].trim()) ? product.images[0] : 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop'}
+                            src={getImageUrl((typeof product.images?.[0] === 'string' && product.images[0].trim()) ? product.images[0] : null) || 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop'}
                             alt={product.name}
                             width={100}
                             height={100}
