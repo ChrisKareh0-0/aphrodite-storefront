@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "../context/CartContext";
-import { PLACEHOLDER_IMAGE, BACKEND_URL } from "@/constants";
+import { PLACEHOLDER_IMAGE, BACKEND_URL, getImageUrl } from "@/constants";
 
 interface Product {
   id: number | string;
@@ -78,8 +78,9 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
     try {
       setAddingId(product.id);
 
-  const rawImage = product.images?.[0];
-  const imageUrl = (typeof rawImage === 'string' && rawImage.trim()) ? rawImage : PLACEHOLDER_IMAGE;
+      // Use getImageUrl to ensure we pass an absolute URL to the cart (and to next/image)
+      const rawImage = product.images?.[0] ?? null;
+      const imageUrl = getImageUrl(rawImage);
 
       addToCart({
         productId: String(product.id),
@@ -130,18 +131,20 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
             {isNewCollection && <span className="new-badge">NEW</span>}
             <div className="product-image-wrapper" onClick={() => handleProductClick(product.slug || String(product.id))}>
                 <Image
-                src={(typeof product.images?.[0] === 'string' && product.images[0].trim()) ? product.images[0] : PLACEHOLDER_IMAGE}
-                alt={product.name}
-                width={250}
-                height={200}
-                onError={(e) => {
-                  console.error(`Failed to load image for product ${product.name}:`, product.images?.[0]);
-                  const imgElement = e.target as HTMLImageElement;
-                  imgElement.src = PLACEHOLDER_IMAGE;
-                }}
-                unoptimized={process.env.NODE_ENV === 'development'}
-                priority={index < 4} // Load first 4 images with priority
-              />
+                  src={getImageUrl(product.images?.[0] ?? null)}
+                  alt={product.name}
+                  width={250}
+                  height={200}
+                  onError={(e) => {
+                    console.error(`Failed to load image for product ${product.name}:`, product.images?.[0]);
+                    const imgElement = e.target as HTMLImageElement;
+                    imgElement.src = PLACEHOLDER_IMAGE;
+                  }}
+                  // We rely on next.config.remotePatterns to allow optimization of the backend images.
+                  // If you prefer to bypass the optimizer for these images, set `unoptimized={true}` here.
+                  unoptimized={process.env.NODE_ENV === 'development'}
+                  priority={index < 4} // Load first 4 images with priority
+                />
               <div className="product-overlay">
                 <button className="overlay-btn" aria-label="Quick view">
                   <i className="bx bx-show"></i>

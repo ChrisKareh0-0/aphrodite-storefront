@@ -292,7 +292,7 @@ export default function CenterNavbar() {
                       <div className="search-results-list">
                         {searchResults.slice(0, 6).map(product => (
                           <div key={product.id} className="search-result-item">
-                            <Image src={product.image} alt={product.name} width={50} height={50} />
+                            <Image src={product.image} alt={product.name} width={50} height={50} unoptimized />
                             <div className="search-result-info">
                               <h4>{product.name}</h4>
                               <span className="category">{product.category}</span>
@@ -351,7 +351,7 @@ export default function CenterNavbar() {
                       <div className="cart-items">
                         {cart.map(item => (
                           <div key={`${item.productId}-${item.color}-${item.size}`} className="cart-item">
-                            <Image src={item.image} alt={item.name} width={60} height={60} />
+                            <Image src={item.image} alt={item.name} width={60} height={60} unoptimized />
                             <div className="cart-item-info">
                               <h4>{item.name}</h4>
                               {item.color && <span className="cart-item-variant">Color: {item.color}</span>}

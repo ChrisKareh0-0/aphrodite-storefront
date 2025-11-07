@@ -284,6 +284,7 @@ export default function CategoriesGallery() {
                 width={1200}
                 height={300}
                 style={{ width: '100%', height: 'auto', objectFit: 'cover', borderRadius: '16px', marginBottom: '2rem' }}
+                unoptimized
               />
             </div>
           )}
