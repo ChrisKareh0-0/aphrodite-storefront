@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { PLACEHOLDER_IMAGE } from "@/constants";
+import { PLACEHOLDER_IMAGE, BACKEND_URL } from "@/constants";
 import InteractiveDots from "./InteractiveDots";
 import CategoriesGallery from "./CategoriesGallery";
 import CenterNavbar from "./CenterNavbar";
@@ -38,8 +38,8 @@ export default function Landing() {
   useEffect(() => {
     (async () => {
       try {
-        console.log('🔄 Fetching hero data from:', `/api/hero`);
-        const response = await fetch(`/api/hero`);
+  console.log('🔄 Fetching hero data from:', `${BACKEND_URL}/api/hero`);
+  const response = await fetch(`${BACKEND_URL}/api/hero`);
         console.log('📡 Hero API Response Status:', response.status);
         const data = await response.json();
         console.log('✅ Hero data:', data);

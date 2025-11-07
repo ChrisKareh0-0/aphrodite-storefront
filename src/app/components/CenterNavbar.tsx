@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "../context/CartContext";
+import { BACKEND_URL } from '@/constants';
 
 interface Product {
   id: number;
@@ -101,7 +102,7 @@ export default function CenterNavbar() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('/api/categories');
+        const response = await fetch(`${BACKEND_URL}/api/categories`);
         if (!response.ok) {
           throw new Error('Failed to fetch categories');
         }

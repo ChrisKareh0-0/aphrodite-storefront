@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import toast from 'react-hot-toast';
-import { PLACEHOLDER_IMAGE } from '@/constants';
+import { PLACEHOLDER_IMAGE, BACKEND_URL } from '@/constants';
 
 interface Product {
   id: number | string;
@@ -82,8 +82,9 @@ export default function ProductsPage() {
       if (featuredOnly) params.append('isFeatured', 'true');
       params.append('limit', '12');
 
-      console.log('🔄 Fetching products with params:', Object.fromEntries(params.entries()));
-      const response = await fetch(`/api/products?${params.toString()}`);
+  console.log('🔄 Fetching products with params:', Object.fromEntries(params.entries()));
+  // Use public products endpoint for storefront
+  const response = await fetch(`${BACKEND_URL}/api/public/products?${params.toString()}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -362,17 +363,22 @@ export default function ProductsPage() {
                     >
                       <div className="product-image">
                         {product.images?.[0] ? (
-                          <img
-                            src={product.images[0]}
-                            alt={product.name}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                            loading="lazy"
-                            onError={(e) => {
-                              // Fallback to placeholder if image fails
-                              const target = e.target as HTMLImageElement;
-                              target.src = PLACEHOLDER_IMAGE;
-                            }}
-                          />
+                          (() => {
+                            const imgSrc = (typeof product.images[0] === 'string' && product.images[0].trim()) ? product.images[0] : PLACEHOLDER_IMAGE;
+                            return (
+                              <img
+                                src={imgSrc}
+                                alt={product.name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                loading="lazy"
+                                onError={(e) => {
+                                  // Fallback to placeholder if image fails
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = PLACEHOLDER_IMAGE;
+                                }}
+                              />
+                            );
+                          })()
                         ) : (
                           <div style={{ width: '100%', height: '100%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <span style={{ color: '#cbd5e1' }}>No Image</span>
@@ -390,7 +396,8 @@ export default function ProductsPage() {
                       </div>
 
                       <div className="product-info">
-                        <div className="product-category">{product.category}</div>
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                        <div className="product-category">{typeof product.category === 'string' ? product.category : ((product.category as any)?.name || (product.category as any)?.slug || '')}</div>
                         <h3 className="product-name">{product.name}</h3>
                         <div className="product-price">
                           <span className="current-price">${product.price}</span>

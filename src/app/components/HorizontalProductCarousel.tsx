@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "../context/CartContext";
-import { PLACEHOLDER_IMAGE } from "@/constants";
+import { PLACEHOLDER_IMAGE, BACKEND_URL } from "@/constants";
 
 interface Product {
   id: number | string;
@@ -14,7 +14,7 @@ interface Product {
   images: string[];
   rating: number;
   description?: string;
-  category?: string;
+  category?: string | { _id?: string; name?: string; slug?: string };
   brand?: string;
   inStock?: boolean;
   originalPrice?: number;
@@ -39,8 +39,9 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        console.log(`🔄 Fetching products for "${title}" from:`, `/api/products?${query}`);
-        const res = await fetch(`/api/products?${query}`);
+  console.log(`🔄 Fetching products for "${title}" from:`, `${BACKEND_URL}/api/public/products?${query}`);
+  // Use public endpoint for storefront
+  const res = await fetch(`${BACKEND_URL}/api/public/products?${query}`);
         console.log(`📡 Products API Response Status:`, res.status);
         const data = await res.json();
         console.log(`✅ Products data for "${title}":`, data);
@@ -77,7 +78,8 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
     try {
       setAddingId(product.id);
 
-      const imageUrl = product.images?.[0] || PLACEHOLDER_IMAGE;
+  const rawImage = product.images?.[0];
+  const imageUrl = (typeof rawImage === 'string' && rawImage.trim()) ? rawImage : PLACEHOLDER_IMAGE;
 
       addToCart({
         productId: String(product.id),
@@ -96,11 +98,12 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
     }
   };
 
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <i key={i} className={`bx ${i < rating ? 'bxs-star' : 'bx-star'}`}></i>
-    ));
-  };
+  // renderStars was unused; keep commented in case we need to enable ratings
+  // const renderStars = (rating: number) => {
+  //   return Array.from({ length: 5 }, (_, i) => (
+  //     <i key={i} className={`bx ${i < rating ? 'bxs-star' : 'bx-star'}`}></i>
+  //   ));
+  // };
 
   if (loading) {
     return (
@@ -126,8 +129,8 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
           >
             {isNewCollection && <span className="new-badge">NEW</span>}
             <div className="product-image-wrapper" onClick={() => handleProductClick(product.slug || String(product.id))}>
-              <Image
-                src={product.images?.[0] || PLACEHOLDER_IMAGE}
+                <Image
+                src={(typeof product.images?.[0] === 'string' && product.images[0].trim()) ? product.images[0] : PLACEHOLDER_IMAGE}
                 alt={product.name}
                 width={250}
                 height={200}
@@ -167,7 +170,7 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
                 )}
                 {product.category && (
                   <div className="product-category">
-                    <span className="label">Category:</span> {product.category}
+                    <span className="label">Category:</span> {typeof product.category === 'string' ? product.category : (product.category?.name || product.category?.slug || '')}
                   </div>
                 )}
                 {product.description && (

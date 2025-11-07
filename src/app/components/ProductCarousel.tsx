@@ -58,9 +58,9 @@ export default function ProductCarousel() {
       setLoading(true);
 
       const categoriesData = await Promise.all([
-        fetch(`${backendUrl}/api/products?category=Clothing&limit=3&sortBy=rating`).then(res => res.json()),
-        fetch(`${backendUrl}/api/products?category=Shoes&limit=3&sortBy=rating`).then(res => res.json()),
-        fetch(`${backendUrl}/api/products?category=Accessories&limit=3&sortBy=rating`).then(res => res.json()),
+        fetch(`${backendUrl}/api/public/products?category=Clothing&limit=3&sortBy=rating`).then(res => res.json()),
+        fetch(`${backendUrl}/api/public/products?category=Shoes&limit=3&sortBy=rating`).then(res => res.json()),
+        fetch(`${backendUrl}/api/public/products?category=Accessories&limit=3&sortBy=rating`).then(res => res.json()),
       ]);
 
       const categories = [
@@ -346,7 +346,7 @@ export default function ProductCarousel() {
                       {category.bestSellers.map((product: Product, pidx: number) => (
                         <div key={pidx} className="product-item" onClick={() => handleProductClick(product.id)}>
                           <Image
-                            src={product.images?.[0] || 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop'}
+                            src={(typeof product.images?.[0] === 'string' && product.images[0].trim()) ? product.images[0] : 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop'}
                             alt={product.name}
                             width={100}
                             height={100}

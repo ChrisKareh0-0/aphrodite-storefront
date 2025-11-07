@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import '../../order-confirmation.css';
+import { BACKEND_URL } from '@/constants';
 
 interface OrderItem {
   product: string;
@@ -44,7 +45,6 @@ interface Order {
 
 export default function OrderConfirmationPage() {
   const params = useParams();
-  const router = useRouter();
   const orderNumber = params.orderNumber as string;
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,7 +55,7 @@ export default function OrderConfirmationPage() {
 
     const fetchOrder = async () => {
       try {
-        const response = await fetch(`/api/orders/${orderNumber}`);
+  const response = await fetch(`${BACKEND_URL}/api/orders/${orderNumber}`);
 
         if (!response.ok) {
           throw new Error('Order not found');

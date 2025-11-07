@@ -6,7 +6,7 @@ import Link from "next/link";
 import toast from 'react-hot-toast';
 import { useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
-import { PLACEHOLDER_IMAGE, getImageUrl } from '@/constants';
+import { PLACEHOLDER_IMAGE, getImageUrl, BACKEND_URL } from '@/constants';
 
 interface ColorOption {
   name: string;
@@ -92,8 +92,9 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
   const fetchProductDetails = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('🔄 Fetching product details for ID:', productId);
-      const response = await fetch(`/api/products/${productId}`);
+  console.log('🔄 Fetching product details for ID:', productId);
+  // Use public endpoint for storefront (admin endpoints are protected)
+  const response = await fetch(`${BACKEND_URL}/api/public/products/${productId}`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -125,27 +126,19 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
       };
 
 
-      // Convert image objects or strings to valid URLs
+      // Convert image objects or strings to valid absolute URLs using getImageUrl
       type ProductImage = string | { _id?: string; path?: string; alt?: string; isPrimary?: boolean };
       processedData.images = (processedData.images || []).map((img: ProductImage) => {
         if (!img) return PLACEHOLDER_IMAGE;
-        // If already a full URL (string)
-        if (typeof img === 'string' && (img.startsWith('http') || img.startsWith('/uploads/') || img.startsWith('/api/'))) {
-          return img;
-        }
-        // If object with _id property
-        if (typeof img === 'object' && img._id) {
-          return `/api/images/products/${processedData.id}/${img._id}`;
-        }
-        // If object with path property (filename)
-        if (typeof img === 'object' && img.path) {
-          return `/uploads/products/${img.path}`;
-        }
-        // If string (maybe just a filename)
         if (typeof img === 'string') {
-          return `/uploads/products/${img}`;
+          if (img.startsWith('http')) return img;
+          return getImageUrl(img) || PLACEHOLDER_IMAGE;
         }
-        // Fallback
+        // object
+        if (typeof img === 'object') {
+          if (img._id) return getImageUrl(`/api/images/products/${processedData.id}/${img._id}`) || PLACEHOLDER_IMAGE;
+          if (img.path) return getImageUrl(`/uploads/products/${img.path}`) || PLACEHOLDER_IMAGE;
+        }
         return PLACEHOLDER_IMAGE;
       });
 
@@ -175,7 +168,8 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
 
   const fetchRelatedProducts = useCallback(async () => {
     try {
-      const response = await fetch(`/api/products/${productId}/related`);
+      // Use public related-products endpoint
+      const response = await fetch(`${BACKEND_URL}/api/public/products/${productId}/related`);
 
       if (!response.ok) {
         console.warn('No related products available');
@@ -266,7 +260,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
 
   const toggleWishlist = async () => {
     try {
-      const response = await fetch(`/api/wishlist/toggle`, {
+      const response = await fetch(`${BACKEND_URL}/api/wishlist/toggle`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -335,6 +329,17 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
   // Fullscreen image handler
   const openFullscreen = (imgUrl: string) => {
     if (!imgUrl) return;
+
+    // Helper to remove overlay and cleanup listeners
+    const removeOverlay = (overlayElem: HTMLDivElement, keyHandler?: (e: KeyboardEvent) => void) => {
+      try {
+        if (keyHandler) document.removeEventListener('keydown', keyHandler);
+        if (overlayElem && overlayElem.parentElement) overlayElem.parentElement.removeChild(overlayElem);
+      } catch {
+        // ignore
+      }
+    };
+
     // Create overlay
     const overlay = document.createElement('div');
     overlay.style.position = 'fixed';
@@ -348,7 +353,10 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
     overlay.style.justifyContent = 'center';
     overlay.style.zIndex = '9999';
     overlay.style.cursor = 'zoom-out';
-    overlay.onclick = () => document.body.removeChild(overlay);
+
+    // Clicking the overlay (outside the image) closes it
+    overlay.addEventListener('click', () => removeOverlay(overlay, keyHandler));
+
     // Create image
     const img = document.createElement('img');
     img.src = imgUrl;
@@ -357,8 +365,46 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
     img.style.borderRadius = '16px';
     img.style.boxShadow = '0 8px 40px rgba(0,0,0,0.5)';
     img.alt = 'Product Image';
+    img.style.cursor = 'auto';
+    // Prevent clicks on the image from bubbling to the overlay
+    img.addEventListener('click', (e) => e.stopPropagation());
+
+    // Create close button (X)
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.innerText = '✕';
+    closeBtn.setAttribute('aria-label', 'Close image');
+    closeBtn.style.position = 'absolute';
+    closeBtn.style.top = '20px';
+    closeBtn.style.right = '20px';
+    closeBtn.style.zIndex = '10000';
+    closeBtn.style.background = 'transparent';
+    closeBtn.style.border = 'none';
+    closeBtn.style.color = '#fff';
+    closeBtn.style.fontSize = '28px';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.style.padding = '6px';
+    closeBtn.style.borderRadius = '6px';
+
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      removeOverlay(overlay, keyHandler);
+    });
+
+    // Add keyboard handler for Escape
+    const keyHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        removeOverlay(overlay, keyHandler);
+      }
+    };
+
+    // Compose overlay contents
     overlay.appendChild(img);
+    overlay.appendChild(closeBtn);
+
+    // Attach and register keydown listener
     document.body.appendChild(overlay);
+    document.addEventListener('keydown', keyHandler);
   };
 
   return (
