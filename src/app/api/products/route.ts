@@ -114,7 +114,50 @@ export async function GET(request: NextRequest) {
     const currentPage = parseInt(page);
     const pageLimit = parseInt(limit);
     const backendPagination = data.pagination;
-    const totalProducts = backendPagination?.total || transformedProducts.length;
+
+    // Handle different backend pagination formats
+    let totalProducts = 0;
+    let totalPages = 0;
+
+    // Format 1: {current, pages, total, limit}
+    if (backendPagination?.pages) {
+      totalProducts = backendPagination.total || 0;
+      totalPages = backendPagination.pages || 0;
+    }
+    // Format 2: {page, totalPages, total, limit}
+    else if (backendPagination?.totalPages) {
+      totalProducts = backendPagination.total || 0;
+      totalPages = backendPagination.totalPages || 0;
+    }
+    // Fallback
+    else {
+      totalProducts = backendPagination?.total || data.total || 0;
+      totalPages = totalProducts > 0 ? Math.ceil(totalProducts / pageLimit) : 0;
+    }
+
+    console.log('📊 Backend Response Data:', {
+      dataKeys: Object.keys(data),
+      backendPagination,
+      totalProducts,
+      totalPages,
+      transformedProductsLength: transformedProducts.length,
+      currentPage,
+      pageLimit
+    });
+
+    // Calculate hasNext and hasPrev
+    const hasNext = currentPage < totalPages;
+    const hasPrev = currentPage > 1;
+
+    console.log('📊 Final Pagination Data:', {
+      totalProducts,
+      totalPages,
+      transformedProductsLength: transformedProducts.length,
+      currentPage,
+      pageLimit,
+      hasNext,
+      hasPrev
+    });
 
     return NextResponse.json({
       products: transformedProducts,
@@ -122,9 +165,9 @@ export async function GET(request: NextRequest) {
         page: currentPage,
         limit: pageLimit,
         total: totalProducts,
-        totalPages: Math.ceil(totalProducts / pageLimit),
-        hasNext: currentPage < Math.ceil(totalProducts / pageLimit),
-        hasPrev: currentPage > 1
+        totalPages: totalPages,
+        hasNext: hasNext,
+        hasPrev: hasPrev
       },
       filters: {
         categories: [],

@@ -67,6 +67,12 @@ export default function ProductsPage() {
     fetchProducts();
   }, [currentPage, selectedCategory, selectedBrand, searchQuery, sortBy, minPrice, maxPrice, featuredOnly]);
 
+  useEffect(() => {
+    if (pagination) {
+      console.log('🔄 Pagination State Updated:', pagination);
+    }
+  }, [pagination]);
+
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
@@ -83,18 +89,29 @@ export default function ProductsPage() {
       params.append('limit', '12');
 
   console.log('🔄 Fetching products with params:', Object.fromEntries(params.entries()));
-  // Use public products endpoint for storefront
-  const response = await fetch(`${BACKEND_URL}/api/public/products?${params.toString()}`);
+  // Use frontend API route for data transformation
+  const response = await fetch(`/api/products?${params.toString()}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: ProductsResponse = await response.json();
+      const data = await response.json();
+      console.log("[DEBUG] Raw API Response:", data);
+      console.log("[DEBUG] Pagination object from API:", data.pagination);
+
       setProducts(data.products);
       setPagination(data.pagination);
       setFilters(data.filters);
-      console.log("[!] ALL DATA",data)
+      console.log("[!] ALL DATA",data);
+      console.log('📄 Pagination Info:', {
+        total: data.pagination?.total,
+        totalPages: data.pagination?.totalPages,
+        hasNext: data.pagination?.hasNext,
+        hasPrev: data.pagination?.hasPrev,
+        shouldShowPagination: data.pagination && data.pagination.total > 0 && data.pagination.totalPages > 1,
+        allPaginationKeys: Object.keys(data.pagination || {})
+      });
 
       // Update URL without page reload
       const url = new URL(window.location.href);
@@ -429,10 +446,14 @@ export default function ProductsPage() {
               )}
 
               {/* Pagination */}
-              {pagination && pagination.totalPages > 1 && (
+              {pagination && (
                 <div className="pagination">
                   <button
-                    onClick={() => setCurrentPage(currentPage - 1)}
+                    type="button"
+                    onClick={() => {
+                      console.log('Previous clicked, current page:', currentPage);
+                      setCurrentPage(Math.max(1, currentPage - 1));
+                    }}
                     disabled={!pagination.hasPrev}
                     className="pagination-btn"
                   >
@@ -441,13 +462,17 @@ export default function ProductsPage() {
                   </button>
 
                   <div className="page-numbers">
-                    {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                    {pagination.totalPages > 1 && Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                       const page = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
                       return (
                         page <= pagination.totalPages && (
                           <button
+                            type="button"
                             key={page}
-                            onClick={() => setCurrentPage(page)}
+                            onClick={() => {
+                              console.log('Page button clicked:', page);
+                              setCurrentPage(page);
+                            }}
                             className={`page-number ${currentPage === page ? 'active' : ''}`}
                           >
                             {page}
@@ -457,8 +482,16 @@ export default function ProductsPage() {
                     })}
                   </div>
 
+                  <div className="page-info">
+                    Page {currentPage} of {pagination.totalPages}
+                  </div>
+
                   <button
-                    onClick={() => setCurrentPage(currentPage + 1)}
+                    type="button"
+                    onClick={() => {
+                      console.log('Next clicked, current page:', currentPage);
+                      setCurrentPage(Math.min(pagination.totalPages, currentPage + 1));
+                    }}
                     disabled={!pagination.hasNext}
                     className="pagination-btn"
                   >
