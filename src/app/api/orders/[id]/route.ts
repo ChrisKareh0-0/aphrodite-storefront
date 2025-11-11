@@ -23,6 +23,7 @@ export async function GET(
         { error: data.error || 'Failed to fetch order' },
         { status: response.status }
       );
+      console.log("❌ Error fetching products for", response.status, data);
     }
 
     return NextResponse.json(data);

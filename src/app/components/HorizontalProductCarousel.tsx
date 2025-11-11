@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "../context/CartContext";
-import { BACKEND_URL, getImageUrl } from "@/constants";
 
 interface Product {
   id: number | string;
@@ -39,13 +38,13 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
     const fetchProducts = async () => {
       try {
         setLoading(true);
-  console.log(`🔄 Fetching products for "${title}" from:`, `${BACKEND_URL}/api/public/products?${query}`);
-  // Use public endpoint for storefront
-  const res = await fetch(`${BACKEND_URL}/api/public/products?${query}`);
+        console.log(`🔄 Fetching products for "${title}" from:`, `/api/products?${query}`);
+        // Use frontend API transformation layer for consistent image URL handling
+        const res = await fetch(`/api/products?${query}`);
         console.log(`📡 Products API Response Status:`, res.status);
         const data = await res.json();
         console.log(`✅ Products data for "${title}":`, data);
-        
+
         if (!data.products || !Array.isArray(data.products)) {
           console.error(`❌ Invalid products response format for "${title}":`, data);
           return;
