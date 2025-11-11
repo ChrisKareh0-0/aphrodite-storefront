@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { BACKEND_URL, getImageUrl, PLACEHOLDER_IMAGE } from "@/constants";
+import { BACKEND_URL, getImageUrl } from "@/constants";
 import { fetchWithConfig } from "@/utils/fetchWithConfig";
 
 interface Product {
@@ -155,11 +155,10 @@ export default function CategoriesGallery() {
               }).filter(Boolean)
             })).slice(0, 4);
 
-            // Ensure each product has at least one image
+            // Log products without images for debugging
             mappedProducts.forEach((prod: BackendProduct) => {
               if (!prod.images || prod.images.length === 0) {
-                console.warn(`⚠️ No images found for product "${prod.name}", using placeholder`);
-                prod.images = [PLACEHOLDER_IMAGE];
+                console.warn(`⚠️ No images found for product "${prod.name}"`);
               }
             });
 
@@ -347,18 +346,20 @@ export default function CategoriesGallery() {
                       <div key={pidx} className="categories-gallery__product">
                         <div className="categories-gallery__product-image-wrapper" onClick={() => handleProductClick(product.slug || String(product.id))}>
                           <div className="categories-gallery__product-image">
-                            <Image
-                              src={product.images?.[0] || PLACEHOLDER_IMAGE}
-                              alt={product.name}
-                              width={400}
-                              height={400}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src = PLACEHOLDER_IMAGE;
-                              }}
-                              unoptimized
-                            />
+                            {product.images?.[0] ? (
+                              <Image
+                                src={product.images[0]}
+                                alt={product.name}
+                                width={400}
+                                height={400}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                unoptimized
+                              />
+                            ) : (
+                              <div style={{ width: '100%', height: '100%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <span style={{ color: '#cbd5e1' }}>No Image</span>
+                              </div>
+                            )}
                           </div>
                           <div className="categories-gallery__product-overlay">
                             <button className="categories-gallery__product-btn">

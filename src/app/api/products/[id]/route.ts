@@ -50,11 +50,6 @@ export async function GET(
       return resolved;
     }).filter(Boolean) || [];
 
-    // Ensure at least one valid image
-    if (images.length === 0) {
-      images = [`${BACKEND_URL}/images/placeholder.svg`];
-    }
-
     // Calculate stock count from stock array
     const stockArray = Array.isArray(product.stock) ? product.stock : [];
     const totalStock = stockArray.reduce((sum: number, item: { quantity?: number }) => sum + (item.quantity || 0), 0);

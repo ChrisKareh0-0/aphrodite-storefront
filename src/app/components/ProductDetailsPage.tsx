@@ -6,7 +6,7 @@ import Link from "next/link";
 import toast from 'react-hot-toast';
 import { useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
-import { PLACEHOLDER_IMAGE, getImageUrl, BACKEND_URL } from '@/constants';
+import { getImageUrl, BACKEND_URL } from '@/constants';
 
 interface ColorOption {
   name: string;
@@ -129,22 +129,21 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
       // Convert image objects or strings to valid absolute URLs using getImageUrl
       type ProductImage = string | { _id?: string; path?: string; alt?: string; isPrimary?: boolean };
       processedData.images = (processedData.images || []).map((img: ProductImage) => {
-        if (!img) return PLACEHOLDER_IMAGE;
+        if (!img) return null;
         if (typeof img === 'string') {
           if (img.startsWith('http')) return img;
-          return getImageUrl(img) || PLACEHOLDER_IMAGE;
+          return getImageUrl(img);
         }
         // object
         if (typeof img === 'object') {
-          if (img._id) return getImageUrl(`/api/images/products/${processedData.id}/${img._id}`) || PLACEHOLDER_IMAGE;
-          if (img.path) return getImageUrl(`/uploads/products/${img.path}`) || PLACEHOLDER_IMAGE;
+          if (img._id) return getImageUrl(`/api/images/products/${processedData.id}/${img._id}`);
+          if (img.path) return getImageUrl(`/uploads/products/${img.path}`);
         }
-        return PLACEHOLDER_IMAGE;
-      });
+        return null;
+      }).filter(Boolean);
 
       if (!processedData.images.length) {
-        console.warn('⚠️ No images found for product, using placeholder');
-        processedData.images = [PLACEHOLDER_IMAGE];
+        console.warn('⚠️ No images found for product');
       }
 
       console.log('🖼️ Processed image URLs:', processedData.images);
@@ -213,7 +212,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         productId: String(product.id),
         name: product.name,
         price: product.price,
-        image: getImageUrl(product.images[0]) || PLACEHOLDER_IMAGE,
+        image: product.images[0] || '',
         color: selectedColor,
         size: selectedSize,
         stock: currentStock,
@@ -243,7 +242,7 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
         productId: String(product.id),
         name: product.name,
         price: product.price,
-        image: getImageUrl(product.images[0]) || PLACEHOLDER_IMAGE,
+        image: product.images[0] || '',
         color: selectedColor,
         size: selectedSize,
         stock: currentStock,
@@ -429,21 +428,17 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
             {/* Image Gallery */}
             <div className="product-gallery">
               <div className="main-image" onClick={() => openFullscreen(product.images?.[selectedImage])} style={{ cursor: 'zoom-in' }}>
-                <Image
-                  src={getImageUrl(product.images?.[selectedImage]) || PLACEHOLDER_IMAGE}
-                  alt={product.name}
-                  width={500}
-                  height={500}
-                  style={{ objectFit: 'contain', width: '100%', height: 'auto' }}
-                  priority
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (target.src !== PLACEHOLDER_IMAGE) {
-                      target.src = PLACEHOLDER_IMAGE;
-                    }
-                  }}
-                  unoptimized
-                />
+                {product.images?.[selectedImage] && (
+                  <Image
+                    src={product.images[selectedImage]}
+                    alt={product.name}
+                    width={500}
+                    height={500}
+                    style={{ objectFit: 'contain', width: '100%', height: 'auto' }}
+                    priority
+                    unoptimized
+                  />
+                )}
                 <button
                   className={`wishlist-btn ${isWishlisted ? 'active' : ''}`}
                   onClick={toggleWishlist}
@@ -459,17 +454,11 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                     onClick={() => setSelectedImage(index)}
                   >
                     <Image
-                      src={getImageUrl(image) || PLACEHOLDER_IMAGE}
+                      src={image}
                       alt={`${product.name} ${index + 1}`}
                       width={100}
                       height={100}
                       style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        if (target.src !== PLACEHOLDER_IMAGE) {
-                          target.src = PLACEHOLDER_IMAGE;
-                        }
-                      }}
                       unoptimized
                     />
                   </button>
@@ -737,20 +726,16 @@ export default function ProductDetailsPage({ productId }: ProductDetailsPageProp
                       onClick={() => router.push(`/product/${relatedProduct.slug || relatedProduct.id}`)}
                     >
                       <div className="product-image">
-                        <Image
-                          src={getImageUrl(relatedProduct.images?.[0]) || PLACEHOLDER_IMAGE}
-                          alt={relatedProduct.name}
-                          width={200}
-                          height={200}
-                          style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            if (target.src !== PLACEHOLDER_IMAGE) {
-                              target.src = PLACEHOLDER_IMAGE;
-                            }
-                          }}
-                          unoptimized
-                        />
+                        {relatedProduct.images?.[0] && (
+                          <Image
+                            src={relatedProduct.images[0]}
+                            alt={relatedProduct.name}
+                            width={200}
+                            height={200}
+                            style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
+                            unoptimized
+                          />
+                        )}
                       </div>
                       <div className="product-info">
                         <h3>{relatedProduct.name}</h3>

@@ -90,11 +90,6 @@ export async function GET(
           return `${BACKEND_URL}${imgStr}`;
         }).filter(Boolean) || [];
 
-        // Ensure at least one valid image
-        if (images.length === 0) {
-          images = [`${BACKEND_URL}/images/placeholder.svg`];
-        }
-
         const category = p.category as Record<string, unknown> | undefined;
         const rating = p.rating as Record<string, unknown> | undefined;
         

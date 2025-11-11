@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { PLACEHOLDER_IMAGE } from "@/constants";
 import InteractiveDots from "./InteractiveDots";
 import CategoriesGallery from "./CategoriesGallery";
 import CenterNavbar from "./CenterNavbar";
@@ -26,7 +25,7 @@ interface HeroData {
 
 export default function Landing() {
   const [heroData, setHeroData] = useState<HeroData>({
-    imageUrl: PLACEHOLDER_IMAGE,
+    imageUrl: '',
     title: 'SUMMER COLLECTION',
     heading: 'FALL - WINTER\nCollection 2025',
     description: 'A specialist label creating luxury essentials. Ethically crafted with an unwavering commitment to exceptional quality.',

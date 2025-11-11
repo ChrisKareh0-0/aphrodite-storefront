@@ -16,12 +16,10 @@ interface MongoImage {
 
 export const getImageUrl = (path?: string | MongoImage | null) => {
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://aphrodite-admin.onrender.com';
-  const ABS_PLACEHOLDER = `${baseUrl}/images/placeholder.svg`;
-  if (!path) return ABS_PLACEHOLDER;
+  if (!path) return null;
   try {
     if (typeof path === 'string') {
-      if (path.startsWith('http') || path === ABS_PLACEHOLDER) return path;
-      if (path === '/images/placeholder.svg') return ABS_PLACEHOLDER;
+      if (path.startsWith('http')) return path;
       // For /uploads/products/ relative path, always prepend backend URL
       if (path.startsWith('/uploads/products/')) {
         return `${baseUrl}${path}`;
@@ -42,15 +40,12 @@ export const getImageUrl = (path?: string | MongoImage | null) => {
       if (path.path) {
         return `${baseUrl}/uploads/${path.path}`;
       }
-      return ABS_PLACEHOLDER;
+      return null;
     }
     console.warn('Unrecognized image path format:', path);
-    return ABS_PLACEHOLDER;
+    return null;
   } catch (error: unknown) {
     console.warn('Invalid image path:', path, error);
-    return ABS_PLACEHOLDER;
+    return null;
   }
 };
-
-// Placeholder image when product image is not available
-export const PLACEHOLDER_IMAGE = (process.env.NEXT_PUBLIC_BACKEND_URL || 'https://aphrodite-admin.onrender.com') + '/images/placeholder.svg';

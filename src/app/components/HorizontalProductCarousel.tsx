@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "../context/CartContext";
-import { PLACEHOLDER_IMAGE, BACKEND_URL, getImageUrl } from "@/constants";
+import { BACKEND_URL, getImageUrl } from "@/constants";
 
 interface Product {
   id: number | string;
@@ -130,21 +130,22 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
           >
             {isNewCollection && <span className="new-badge">NEW</span>}
             <div className="product-image-wrapper" onClick={() => handleProductClick(product.slug || String(product.id))}>
-                <Image
-                  src={getImageUrl(product.images?.[0] ?? null)}
-                  alt={product.name}
-                  width={250}
-                  height={200}
-                  onError={(e) => {
-                    console.error(`Failed to load image for product ${product.name}:`, product.images?.[0]);
-                    const imgElement = e.target as HTMLImageElement;
-                    imgElement.src = PLACEHOLDER_IMAGE;
-                  }}
-                  // We rely on next.config.remotePatterns to allow optimization of the backend images.
-                  // If you prefer to bypass the optimizer for these images, set `unoptimized={true}` here.
-                  unoptimized={process.env.NODE_ENV === 'development'}
-                  priority={index < 4} // Load first 4 images with priority
-                />
+                {product.images?.[0] ? (
+                  <Image
+                    src={product.images[0]}
+                    alt={product.name}
+                    width={250}
+                    height={200}
+                    // We rely on next.config.remotePatterns to allow optimization of the backend images.
+                    // If you prefer to bypass the optimizer for these images, set `unoptimized={true}` here.
+                    unoptimized={process.env.NODE_ENV === 'development'}
+                    priority={index < 4} // Load first 4 images with priority
+                  />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
+                    <span style={{ color: '#cbd5e1' }}>No Image</span>
+                  </div>
+                )}
               <div className="product-overlay">
                 <button className="overlay-btn" aria-label="Quick view">
                   <i className="bx bx-show"></i>

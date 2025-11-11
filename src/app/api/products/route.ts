@@ -69,11 +69,6 @@ export async function GET(request: NextRequest) {
         imageUrls = [imgUrl.startsWith('http') ? imgUrl : `${BACKEND_URL}${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`];
       }
 
-      // Ensure at least one valid image
-      if (imageUrls.length === 0) {
-        imageUrls = ['/images/placeholder.svg'];
-      }
-
       // Log the image URLs for debugging
       console.log(`Product ${product.name} images:`, imageUrls);
 
