@@ -276,7 +276,7 @@ export default function CategoriesGallery() {
           {collectionSettings.imageUrl && (
             <div className="categories-gallery__header-image">
               <Image
-                src={getImageUrl(collectionSettings.imageUrl)}
+                src={collectionSettings.imageUrl}
                 alt={collectionSettings.title}
                 width={1200}
                 height={300}

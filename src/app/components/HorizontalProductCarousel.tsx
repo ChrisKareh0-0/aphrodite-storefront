@@ -78,15 +78,11 @@ export default function HorizontalProductCarousel({ title, query, subtitle, isNe
     try {
       setAddingId(product.id);
 
-      // Use getImageUrl to ensure we pass an absolute URL to the cart (and to next/image)
-      const rawImage = product.images?.[0] ?? null;
-      const imageUrl = getImageUrl(rawImage);
-
       addToCart({
         productId: String(product.id),
         name: product.name,
         price: product.price,
-        image: imageUrl,
+        image: product.images?.[0] || '',
         stock: 999, // Default stock for carousel items
       });
 
